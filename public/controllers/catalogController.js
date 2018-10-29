@@ -24,12 +24,10 @@ app.get('/categories/:category', function (req, res) {
 app.get('/categories/:category/:item', function (req, res) {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
-    if(utilityFunctions.validateCategory(category) == true && itemModel.getItem(req.params.item) != false) {
-        var item = itemModel.getItem(req.params.item);
-        res.render('item', { title: "CDXchange | " + items[0].itemName, items: items});
-    } else if (utilityFunctions.validateCategory(category) == true && itemModel.getItem(req.params.item) == false) {
-        var items = itemModel.getItemsByCategory(category);
-        res.render('category', { title: "CDXchange | " + category, category: category, items: items });
+    if(utilityFunctions.validateCategory(category) == true) {
+        ItemModel.findById(req.params.item).then(function(doc) {
+            res.render('item', { title: "CDXchange | " + doc.itemName, item: doc });
+        });
     } else {
         res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
     }

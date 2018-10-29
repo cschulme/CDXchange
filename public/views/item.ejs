@@ -18,32 +18,32 @@
                 <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
                 <a href="/" class="button__bar">Home</a> > 
                 <a href="/categories" class="button__bar">Categories</a> >
-                <a href="/categories/<%= items[0].catalogCategory %>" class="button__bar"><%= items[0].catalogCategory %></a> >
-                <a href="/categories/<%= items[0].catalogCategory %>/<%= items[0].itemCode %>" class="button__bar"><%= items[0].itemName %></a>
+                <a href="/categories/<%= item.catalogCategory %>" class="button__bar"><%= item.catalogCategory %></a> >
+                <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bar"><%= item.itemName %></a>
             </section>
             <section id="album-content">
                 <div class="content__wrapper album-content__wrapper">
                     <div class="album-content__info">
-                        <img src="<%= items[0].imageURL %>" alt="<%= items[0].itemName %> Album Cover" class="album-content__info--image">
+                        <img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="album-content__info--image">
                         <div class="album-content__info--data">
                             <div class="album-content__info--data-header">
-                                <h2><%= items[0].itemName %></h2>
+                                <h2><%= item.itemName %></h2>
                                 <span class="rating">
-                                    <% for(var j = 1; j <= items[0].rating; j++) { %>
+                                    <% for(var j = 1; j <= item.rating; j++) { %>
                                         <i class="fas fa-star checked"></i>
                                     <% } %>
-                                    <% for(var j = 5; j > items[0].rating; j--) { %>
+                                    <% for(var j = 5; j > item.rating; j--) { %>
                                         <i class="fas fa-star"></i>
                                     <% } %>
                                 </span>
                             </div>
-                            <h3><%= items[0].artist %></h3>
-                            <h3><%= items[0].year %> | &copy; <%= items[0].recordLabel %></h3>
+                            <h3><%= item.artist %></h3>
+                            <h3><%= item.year %> | &copy; <%= item.recordLabel %></h3>
                             <p>
-                                <%= items[0].description %>
+                                <%= item.description %>
                             </p>
-                            <a href="/categories/<%= items[0].catalogCategory %>/<%= items[0].itemCode %>/swap" class="button__bubble button__bubble--medium">Swap It</a>
-                            <a href="/categories/<%= items[0].catalogCategory %>/<%= items[0].itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
+                            <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>/swap" class="button__bubble button__bubble--medium">Swap It</a>
+                            <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
                         </div>
                     </div>
                     <div class="album-content__tracks">
