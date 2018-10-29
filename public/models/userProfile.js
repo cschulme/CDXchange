@@ -1,9 +1,11 @@
 // --- MODULES ---
 const db = require('../db');
 const mongoose = require('mongoose');
+const ItemModule = require('./item');
+const UserModule = require('./user');
 
 // --- MODEL ---
-const UserProfileSchema = new Schema({
+const UserProfileSchema = new mongoose.Schema({
     _id: String,
     _userId: Number,
     userItems: Array
@@ -17,7 +19,5 @@ const UserProfileSchema = new Schema({
 });
 
 const UserProfile = db.model('UserProfile', UserProfileSchema);
-
-// Make sure UserProfile collection is populated.
 
 module.exports = UserProfile;

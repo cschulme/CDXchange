@@ -3,7 +3,7 @@ const db = require('../db');
 const mongoose = require('mongoose');
 
 // --- MODEL ---
-const SwapSchema = new Schema({
+const SwapSchema = new mongoose.Schema({
     _id: String,
     _userId: Number,
     rating: Number,

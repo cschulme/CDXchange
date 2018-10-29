@@ -1,6 +1,6 @@
 <nav id="user-nav">
     <ul>
-        <% if(typeof theUser !== 'undefined') { %>
+        <% if(theUser.user == true) { %>
             <li><a href="/signout" class="button__bubble button__bubble--large">Sign Out</a></li>
         <% } else { %>
             <li><a href="/signin" class="button__bubble button__bubble--large">Sign In</a></li>
