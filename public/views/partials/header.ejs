@@ -1,0 +1,8 @@
+<header>
+    <a href="/" class="logo barHoverEffect"><h1>CDX<span class="logo--colored">change</span></h1></a>
+    <% if(typeof theUser !== 'undefined') { %>
+        <span id="loginMessage">Welcome, <%= theUser.name %></span>
+    <% } else { %>
+        <span id="loginMessage">Not signed in</span>
+    <% } %>
+</header>

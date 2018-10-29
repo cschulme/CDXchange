@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/contact" class="button__bar">Contact</a>
+            </section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>Contact</h2>
+                    <p>Questions or comments?  Contact me below!</p>
+                    <address>
+                        Email: <a href="mailto:cschulme@uncc.edu" class="button__bar button__bar--small">cschulme@uncc.edu</a>
+                        <br>
+                        <br>
+                        Phone: 1 (810) 845-4635
+                    </address>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

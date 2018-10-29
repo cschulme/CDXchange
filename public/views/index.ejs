@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb"><a href="/" class="button__bar">Home</a></section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>Welcome to CDXchange</h2>
+                    <p>
+                        In the age of streaming media, we know there are still people out there who value the physical media:
+                        the album art, the lyric booklets, the permanence of the media... not to mention being able to look
+                        at your sprawling CD collection!
+                    </p>
+                    <p>
+                        CDXchange is your hub for trading, buying, and selling CDs in your local area and beyond.
+                        Browse by categories to find what you're looking for... or discover something new entirely!
+                    </p>
+                    <p>
+                        Powered by
+                        <span class="icon--large">
+                            <i class="fab fa-node"></i> &nbsp; 
+                            <i class="fab fa-js-square"></i>
+                        </span>
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/about" class="button__bar">About</a>
+            </section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>About</h2>
+                    <p>
+                        CDXchange is your hub for trading CDs, locally and beyond!
+                    </p>
+                    <p>
+                        Under "My CDs", you'll be able to see the CDs you have on your profile.
+                        These CDs are both the one's you'll be able to use to trade for other
+                        CDs, as well as the one's others can see and make offers to trade for.
+                    </p>
+                    <p>
+                        Once you have some CDs under your profile, you'll be able to start 
+                        trading.  Browse our categories to see what we have on offer, finding 
+                        the CDs that match your interests.  From pop to metal, rap to country, 
+                        we're sure you'll be able to find something you like.  Once you find a 
+                        CD you're interested in, you can request to swap it for one of your own.
+                    </p>
+                    <p>
+                        Under "My Swaps", you can review the pending swaps you have: both the swaps
+                        you've initiated and the ones that are being offered to you.  You can withdraw
+                        your swaps, or accept/reject the swaps offers other have made to you.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

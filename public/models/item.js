@@ -2,24 +2,24 @@
 const db = require('../db');
 
 // --- MODEL ---
-const Item = db.model('Item',
-    {
-        // ItemCode.
-        _id: String,
-        itemName: String,
-        artist: _artistId,
-        year: Number,
-        recordLabel: String,
-        catalogCategory: String,
-        description: String,
-        rating: {
-            type: Number,
-            min: 0,
-            max: 5
-        },
-        imageURL: String
-    }
-);
+const ItemSchema = new Schema({
+    // ItemCode.
+    _id: String,
+    itemName: String,
+    artist: _artistId,
+    year: Number,
+    recordLabel: String,
+    catalogCategory: String,
+    description: String,
+    rating: {
+        type: Number,
+        min: 0,
+        max: 5
+    },
+    imageURL: String
+})
+
+const Item = db.model('Item', ItemSchema);
 
 module.exports = {
 

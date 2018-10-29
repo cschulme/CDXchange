@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/myitems" class="button__bar">My CDs</a>
+            </section>
+            <section class="content__shell">
+                <div class="content__wrapper">
+                    <h2 class="section--header">Your CDs for Swap</h2>
+                    <% if(typeof items !== 'undefined') { %>
+                    <table>
+                        <tr>
+                            <th>Album</th>
+                            <th>Artist</th>
+                            <th>Year</th>
+                            <th>Category</th>
+                            <th>Rating</th>
+                            <th></th>
+                        </tr>
+                        <% items.forEach(function(item) {%>
+                            <tr>
+                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
+                                <td><%= item.year %></td>
+                                <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                <td>
+                                    <span class="rating">
+                                        <% for(var j = 1; j <= item.rating; j++) { %>
+                                            <i class="fas fa-star checked"></i>
+                                        <% } %>
+                                        <% for(var j = 5; j > item.rating; j--) { %>
+                                            <i class="fas fa-star"></i>
+                                        <% } %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--small">Update</a>
+                                    <a href="/myItems?action=delete&theItem=<%= item.itemCode %>" class="button__bubble button__bubble--small">Delete</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </table>
+                    <% } else { %>
+                        <h3>There's no items to show!  Please log in.</h3>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

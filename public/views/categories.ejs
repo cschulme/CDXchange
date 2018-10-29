@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/categories" class="button__bar">Categories</a>
+            </section>
+            <section id="categoryHolder">
+                <a href="/categories/pop" class="categoryCard" id="popMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Pop</h2>
+                    </div>
+                </a>
+                <a href="/categories/alternative" class="categoryCard" id="alternativeMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Alternative</h2>
+                    </div>
+                </a>
+                <a href="/categories/rock" class="categoryCard" id="rockMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Rock</h2>
+                    </div>
+                </a>
+                <a href="/categories/country" class="categoryCard" id="countryMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Country</h2>
+                    </div>
+                </a>
+                <a href="/categories/rap" class="categoryCard" id="rapMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Rap</h2>
+                    </div>
+                </a>
+                <a href="/categories/metal" class="categoryCard" id="metalMusic">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2>Metal</h2>
+                    </div>
+                </a>
+            </section>
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/categories" class="button__bar">Categories</a> >
+                <a href="/categories/<%= category %>" class="button__bar"><%= category %></a>
+            </section>
+            <section id="categoryContent">
+                <div class="categoryCard onCategory" id="<%= category.toLowerCase() %>Music">
+                    <div class="cardOverlay"></div>
+                    <div class="cardContent">
+                        <h2><%= category %></h2>
+                    </div>
+                </div>
+                <div id="categoryList">
+                    <table>
+                        <tr>
+                            <th>Album</th>
+                            <th>Artist</th>
+                            <th>Year</th>
+                            <th>Rating</th>
+                        </tr>
+                        <% for(var i = 0; i < items.length; i++) { %>
+                            <tr>
+                                <td><a href="/categories/<%= category %>/<%= items[i].itemCode %>" class="button__bar button__bar--small"><%= items[i].itemName %></a></td>
+                                <td><a href="/artists" class="button__bar button__bar--small"><%= items[i].artist %></a></td>
+                                <td><%= items[i].year %></td>
+                                <td>
+                                    <span class="rating">
+                                        <% for(var j = 1; j <= items[i].rating; j++) { %>
+                                            <i class="fas fa-star checked"></i>
+                                        <% } %>
+                                        <% for(var j = 5; j > items[i].rating; j--) { %>
+                                            <i class="fas fa-star"></i>
+                                        <% } %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </table>
+                </div>
+            </section>
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

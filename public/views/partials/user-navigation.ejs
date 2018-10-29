@@ -1,0 +1,19 @@
+<nav id="user-nav">
+    <ul>
+        <% if(typeof theUser !== 'undefined') { %>
+            <li><a href="/signout" class="button__bubble button__bubble--large">Sign Out</a></li>
+        <% } else { %>
+            <li><a href="/signin" class="button__bubble button__bubble--large">Sign In</a></li>
+        <% } %>
+        <li><a href="/myitems" class="button__bubble button__bubble--large">My CDs</a></li>
+        <li><a href="/myswaps" class="button__bubble button__bubble--large">My Swaps</a></li>
+        <li><a href="#" class="button__bubble button__bubble--large">Cart</a></li>
+    </ul>
+
+    <form method="post" class="search__form">
+        <input type="text" placeholder="Search... (Placeholder: not operational.)" class="search__bar display__none">
+        <div class="search__expand"><i class="fa fa-search"></i></div>
+        <button type="submit" class="search__bar--submit display__none"><i class="fa fa-search"></i></button>
+    </form>
+    
+</nav>

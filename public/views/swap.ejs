@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/categories" class="button__bar">Categories</a> >
+                <a href="/categories/<%= category %>" class="button__bar"><%= category %></a> >
+                <a href="/categories/<%= category %>/<%= items[0].itemCode %>" class="button__bar"><%= items[0].itemName %></a> >
+                <a href="/categories/<%= category %>/<%= items[0].itemCode %>/swap" class="button__bar">Swap</a>
+            </section>
+            <section class="content__shell">
+                <div class="content__wrapper">
+                    <h2 class="section--header">Swap this CD...</h2>
+                    <br>
+                    <div class="album-content__info album-content__info--small">
+                        <img src="<%= items[0].imageURL %>" alt="<%= items[0].itemName %> Album Cover" class="album-content__info--image">
+                        <div class="album-content__info--data">
+                            <div class="album-content__info--data-header">
+                                <h2><%= items[0].itemName %></h2>
+                                <span class="rating">
+                                    <% for(var j = 1; j <= items[0].rating; j++) { %>
+                                        <i class="fas fa-star checked"></i>
+                                    <% } %>
+                                    <% for(var j = 5; j > items[0].rating; j--) { %>
+                                        <i class="fas fa-star"></i>
+                                    <% } %>
+                                </span>
+                            </div>
+                            <h3><%= items[0].artist %> | <%= items[0].year %> | &copy; <%= items[0].recordLabel %></h3>
+                            <p>
+                                <%= items[0].description %>
+                            </p>
+                        </div>
+                    </div>
+                    <br>
+                    <h2 class="section--header">...for one of yours:</h2>
+                    <br>
+                    <% if(typeof myItems !== 'undefined') { %>
+                        <form>
+                            <table>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Album</th>
+                                    <th>Artist</th>
+                                    <th>Year</th>
+                                    <th>Category</th>
+                                    <th>Rating</th>
+                                </tr>
+                                <% myItems.forEach(function(myItem){ %>
+                                    <tr>
+                                        <td><input type="radio" name="swappedAlbum" value="<%= myItem.itemCode %>" class="form__radio-button"></td>
+                                        <td><a href="/categories/<%= myItem.catalogCategory %>/<%= myItem.itemCode %>" class="button__bar button__bar--small"><%= myItem.itemName %></a></td>
+                                        <td><a href="/artists" class="button__bar button__bar--small"><%= myItem.artist %></a></td>
+                                        <td><%= myItem.year %></td>
+                                        <td><a href="/categories/<%= myItem.catalogCategory %>" class="button__bar button__bar--small"><%= myItem.catalogCategory %></a></td>
+                                        <td>
+                                            <span class="rating">
+                                                <% for(var j = 1; j <=  myItem.rating; j++) { %>
+                                                    <i class="fas fa-star checked"></i>
+                                                <% } %>
+                                                <% for(var j = 5; j > myItem.rating; j--) { %>
+                                                    <i class="fas fa-star"></i>
+                                                <% } %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </table>
+                            <br>
+                            <button class="button__bubble button__bubble--large right" value="submit">Confirm Swap</button>
+                            <br>
+                            <br>
+                        </form>
+                    <% } else { %>
+                        <h3>There are no items to show!  Please log in.</h3>
+                    <% } %>
+                </div>
+            </section>
+
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>
