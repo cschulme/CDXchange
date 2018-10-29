@@ -1,12 +1,3 @@
-const jsdom = require('jsdom').env('', function(err, window) {
-    if(err) {
-        console.error(err);
-        return;
-    }
-
-    global.$ = require('jquery')(window);
-});
-
 $(document).ready(function() {
     $('.collapse').click(function (){
         $('body').removeClass("nav-expanded").addClass("nav-collapsed");
