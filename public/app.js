@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const db = require('./db');
 const staticController = require('./controllers/staticController');
-const profileController = require('./controllers/profileController');
+// const profileController = require('./controllers/profileController');
 const catalogController = require('./controllers/catalogController');
 
 
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'assets')));
 
 // --- ROUTES ---
 app.use(staticController);
-app.use(profileController);
+// app.use(profileController);
 app.use(catalogController);
 
 // 404 Route

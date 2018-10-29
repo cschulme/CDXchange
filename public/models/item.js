@@ -1,12 +1,13 @@
 // --- MODULES ---
 const db = require('../db');
+const mongoose = require('mongoose');
 
 // --- MODEL ---
-const ItemSchema = new Schema({
+const ItemSchema = new mongoose.Schema({
     // ItemCode.
     _id: String,
     itemName: String,
-    artist: _artistId,
+    artist: String,
     year: Number,
     recordLabel: String,
     catalogCategory: String,

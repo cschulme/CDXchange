@@ -1,8 +1,9 @@
 // --- MODULES ---
 const db = require('../db');
+const mongoose = require('mongoose');
 
 // --- MODEL ---
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
     _id: Number,
     firstName: String,
     lastName: String,
