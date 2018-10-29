@@ -35,23 +35,23 @@
                             <th>Year</th>
                             <th>Rating</th>
                         </tr>
-                        <% for(var i = 0; i < items.length; i++) { %>
+                        <% items.forEach( function(item) { %>
                             <tr>
-                                <td><a href="/categories/<%= category %>/<%= items[i].itemCode %>" class="button__bar button__bar--small"><%= items[i].itemName %></a></td>
-                                <td><a href="/artists" class="button__bar button__bar--small"><%= items[i].artist %></a></td>
-                                <td><%= items[i].year %></td>
+                                <td><a href="/categories/<%= category %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
+                                <td><%= item.year %></td>
                                 <td>
                                     <span class="rating">
-                                        <% for(var j = 1; j <= items[i].rating; j++) { %>
+                                        <% for(var j = 1; j <= item.rating; j++) { %>
                                             <i class="fas fa-star checked"></i>
                                         <% } %>
-                                        <% for(var j = 5; j > items[i].rating; j--) { %>
+                                        <% for(var j = 5; j > item.rating; j--) { %>
                                             <i class="fas fa-star"></i>
                                         <% } %>
                                     </span>
                                 </td>
                             </tr>
-                        <% } %>
+                        <% }); %>
                     </table>
                 </div>
             </section>

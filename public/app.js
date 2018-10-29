@@ -4,6 +4,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const db = require('./db');
+const item = require('./models/item');
 const staticController = require('./controllers/staticController');
 // const profileController = require('./controllers/profileController');
 const catalogController = require('./controllers/catalogController');

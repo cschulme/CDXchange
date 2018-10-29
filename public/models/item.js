@@ -16,45 +16,44 @@ const ItemSchema = new mongoose.Schema({
         type: Number,
         min: 0,
         max: 5
+    }
+}, {
+    toObject: {
+        virtuals: true
     },
-    imageURL: String
-})
+    toJson: {
+        virtuals: true
+    }
+});
+
+ItemSchema.virtual('imageURL').get(function() {
+    return '/Images/AlbumCovers/' + this._id + '.jpg';
+});
 
 const Item = db.model('Item', ItemSchema);
 
-module.exports = {
+// Make sure DB is populated.
+var CDs = [
+    { _id: 'TaylorSwift-1989', itemName: '1989', artist: 'Taylor Swift', year: 2014, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: 'On 1989, Taylor Swift fully embraces her shift to synth pop, with stadium-ready anthems and harrowing ballads.', rating: 4 },
+    { _id: 'TaylorSwift-Reputation', itemName: 'Reputation', artist: 'Taylor Swift', year: 2017, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: '', rating: 3 },
+    { _id: 'TroyeSivan-Bloom', itemName: 'Bloom', artist: 'Troye Sivan', year: 2018, recordLabel: 'EMI Australia', catalogCategory: 'Pop', description: '', rating: 5 }
+];
 
-    // Returns all items in the Item collection.
-    getItems: function() {
-        Item.find(function(err, result) {
-            if (err) {
-                return handdleError(err);
+Item.countDocuments({}, function(err, count) {
+    Item.find(function(err, result) {
+        console.log(result);
+    });
+
+    if(count == 0) {
+        console.log("Item count == 0.");
+        Item.collection.insert(CDs, function(err, result) {
+            if(err) {
+                return console.error(err);
             } else {
-                return result;
+                console.log("Item collection populated.");
             }
         });
-    },
-
-    // Returns the item with the _id matching itemId.
-    getItem: function(itemId) {
-        Item.findById(itemID, function(err, result) {
-            if (err) {
-                return handleError(err);
-            } else {
-                return result;
-            }
-        });
-    },
-
-    // Returns all items of a given category.
-    getItemsByCategory: function(category) {
-        Item.find( { catalogCategory: category }, function(err, result) {
-            if (err) {
-                return handleError(err);
-            } else {
-                return result;
-            }
-        })
     }
+});
 
-}
+module.exports = Item;
