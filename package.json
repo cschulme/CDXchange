@@ -1,0 +1,29 @@
+{
+  "name": "cdxchange",
+  "version": "1.0.0",
+  "description": "MVC item swapping project.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cschulme/CDXchange.git"
+  },
+  "author": "Christian Schulmeister",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cschulme/CDXchange/issues"
+  },
+  "homepage": "https://github.com/cschulme/CDXchange#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "jquery": "^3.3.1",
+    "jsdom": "^12.2.0",
+    "mongodb": "^3.1.8",
+    "mongoose": "^5.3.7"
+  }
+}
