@@ -1,6 +1,6 @@
 // --- MODULES ---
-var express = require('express');
-var app = module.exports = express();
+const express = require('express');
+const app = module.exports = express();
 
 // --- ROUTES ---
 app.get('/', function (req, res) {

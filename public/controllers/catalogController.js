@@ -1,8 +1,8 @@
 // --- MODULES ---
-var express = require('express');
-var app = module.exports = express();
-var ItemModel = require('../models/item');
-var utilityFunctions = require('../utilityFunctions');
+const express = require('express');
+const app = module.exports = express();
+const ItemModel = require('../models/item');
+const utilityFunctions = require('../utilityFunctions');
 
 // --- ROUTES ---
 app.get('/categories', function (req, res) {

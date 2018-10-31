@@ -1,12 +1,11 @@
 // --- MODULES ---
 const db = require('../db');
 const mongoose = require('mongoose');
-const ItemModule = require('./item');
-const UserModule = require('./user');
+const ItemModel = require('./item');
 
 // --- MODEL ---
 const UserProfileSchema = new mongoose.Schema({
-    _id: String,
+    _id: Number,
     _userId: Number,
     userItems: Array
 }, {
@@ -20,4 +19,5 @@ const UserProfileSchema = new mongoose.Schema({
 
 const UserProfile = db.model('UserProfile', UserProfileSchema);
 
+// --- EXPORT ---
 module.exports = UserProfile;

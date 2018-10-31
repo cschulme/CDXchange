@@ -55,6 +55,9 @@
                             </tr>
                         <% }); %>
                     </table>
+                    <% } else if (theUser.user == true) { %>
+                        <h3>There's no items to show!  Time to start adding some items to your account!</h3>
+                        <a href="#" class="button__bubble button__bubble--medium">Add some items</a>
                     <% } else { %>
                         <h3>There's no items to show!  Please log in.</h3>
                     <% } %>

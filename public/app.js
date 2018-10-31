@@ -20,13 +20,26 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'assets')));
 
+// --- MIDDLEWARE ---
+app.use(function(req, res, next) {
+    if(typeof req.session.theUser !== 'undefined') {
+        var fullName = req.session.theUser.firstName + " " + req.session.theUser.lastName;
+
+        res.locals.theUser = { name: fullName, user: true };
+    } else {
+        res.locals.theUser = { user: false };
+    }
+
+    next();
+});
+
 // --- ROUTES ---
 app.use(staticController);
 app.use(profileController);
 app.use(catalogController);
 
 // 404 Route
-app.use(function(req, res, next){
+app.use(function(req, res, next) {
     res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
 });
 
