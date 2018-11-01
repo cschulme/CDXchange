@@ -34,7 +34,7 @@
                         </tr>
                         <% items.forEach(function(item) {%>
                             <tr>
-                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
                                 <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
                                 <td><%= item.year %></td>
                                 <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>

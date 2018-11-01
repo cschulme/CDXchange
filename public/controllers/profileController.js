@@ -62,10 +62,8 @@ app.get('/myitems', function(req, res) {
     }
 
     if(req.session.currentProfile) {
-        console.log("req.session.currentProfile == true!");
         var items = req.session.currentProfile.userItems;
     } else {
-        console.log("req.session.currentPRofile == false!");
         var items = undefined;
     }
 
@@ -74,9 +72,12 @@ app.get('/myitems', function(req, res) {
 
 app.get('/mySwaps', (req, res) => {
     if(req.session.currentProfile) {
-
+        console.log(req.session.currentSwaps);
+        let mySwaps = req.session.currentSwaps;
+        res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps });
     } else {
-
+        let mySwaps = undefined;
+        res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps });
     }
 });
 
@@ -104,7 +105,7 @@ function getUserQuery(callback) {
 }
 
 function getProfileQuery(id, callback) {
-    UserProfileModel.find( { _userId: id }, function(err, doc) {
+    UserProfileModel.findOne( { _userId: id }, function(err, doc) {
         if(doc) {
             callback(null, doc);
         } else {

@@ -22,39 +22,28 @@
             <section class="content__shell">
                 <div class="content__wrapper">
                     <h2 class="section--header">Your Swap Offers</h2>
-                    <% if(typeof myItems !== 'undefined') { %>
+                    <% if(typeof mySwaps !== 'undefined') { %>
                         <table>
                             <tr>
                                 <th>Your Album</th>
                                 <th>Their Album</th>
+                                <th>Status</th>
                                 <th></th>
                             </tr>
 
-                            <% myItems.forEach(function(item) { %>
-                                <tr>
-                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
-                                    <td> --- </td>
-                                    <td><a href="/mySwaps?action=withdraw&theItem=<%= item.itemCode %>" class="button__bubble button__bubble--small">Withdraw</a></td>
-                                </tr>
+                            <% mySwaps.forEach(function(swap) { %>
+                                <% if(swap.status == 'Available') { %>
+                                    <tr>
+                                        <td><a href="/categories/<%= item.catalogCategory %>/<%= swap._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item._id %></a></td>
+                                        <td>---</td>
+                                        <td><a href="/mySwaps?action=withdraw&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
+                                    </tr>
+                                <% } %>
                             <% }) %>
-                            
-                            <tr>
-                                <td><a href="/categories/Pop/TaylorSwift-1989" class="button__bar button__bar--small">Taylor Swift - 1989</a></td>
-                                <td><a href="/categories/Rap/Eminem-Kamikaze" class="button__bar button__bar--small">Eminem - Kamikaze</a></td>
-                                <td>
-                                    <a href="#" class="button__bubble button__bubble--small">Accept</a>
-                                    <a href="#" class="button__bubble button__bubble--small">Reject</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><a href="/categories/Pop/TaylorSwift-1989" class="button__bar button__bar--small">Taylor Swift - 1989</a></td>
-                                <td><a href="/categories/Pop/CharliXCX-Pop2" class="button__bar button__bar--small">Charli XCX - Pop 2</a></td>
-                                <td>
-                                    <a href="#" class="button__bubble button__bubble--small">Accept</a>
-                                    <a href="#" class="button__bubble button__bubble--small">Reject</a>
-                                </td>
-                            </tr>
                         </table>
+                    <% } else if (theUser.user == true) { %>
+                        <h3>There's no items to show!  Time to start adding some items to your account!</h3>
+                        <a href="#" class="button__bubble button__bubble--medium">Add some items</a>
                     <% } else { %>
                         <h3>There's no items to show!  Please log in.</h3>
                     <% } %>
