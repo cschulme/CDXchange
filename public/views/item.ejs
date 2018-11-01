@@ -42,7 +42,7 @@
                             <p>
                                 <%= item.description %>
                             </p>
-                            <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>/swap" class="button__bubble button__bubble--medium">Swap It</a>
+                            <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It</a>
                             <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
                         </div>
                     </div>

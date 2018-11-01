@@ -49,8 +49,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--small">Update</a>
-                                    <a href="/myItems?action=delete&theItem=<%= item.itemCode %>" class="button__bubble button__bubble--small">Delete</a>
+                                    <a href="/myItems?action=update&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Update</a>
+                                    <a href="/myItems?action=delete&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Delete</a>
                                 </td>
                             </tr>
                         <% }); %>

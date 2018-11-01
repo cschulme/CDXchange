@@ -34,9 +34,10 @@
                             <% mySwaps.forEach(function(swap) { %>
                                 <% if(swap.status == 'Available') { %>
                                     <tr>
-                                        <td><a href="/categories/<%= item.catalogCategory %>/<%= swap._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item._id %></a></td>
+                                        <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
                                         <td>---</td>
-                                        <td><a href="/mySwaps?action=withdraw&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
+                                        <td>Available</td>
+                                        <td><a href="/mySwaps?action=withdraw&theItem=<%= swap.item._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
                                 <% } %>
                             <% }) %>

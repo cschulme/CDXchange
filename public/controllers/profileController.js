@@ -45,34 +45,76 @@ app.get('/signout', function(req, res) {
 })
 
 app.get('/myitems', function(req, res) {
-    if(req.session.currentProfile && req.query.action && req.query.theItem && validateItem(req.query.theItem)) {
-        switch(req.query.action.toLowerCase()) {
-            case 'update':
-
-                break;
-            case 'delete':
-                deleteItemFromProfile(userId, item, (err) => {
-                    if(!err) {
-                        res.redirect('myitems');
+    if(req.session.currentProfile && req.query.action && req.query.theItem) {
+        if(req.query.action == 'update') {
+            getSwap(req.session.theUser._id, req.query.theItem, (err, swap) => {
+                if(!err) {
+                    if(swap.status == 'Available' || swap.status == 'Swapped') {
+                        getItem(req.query.theItem, (err, item) => {
+                            if(!err) {
+                                res.redirect('/categories/' + item.catalogCategory + '/' + item._id);
+                            } else {
+                                res.redirect('/myItems');
+                            }
+                        });
                     }
-                });
-                break;
-            default:
+                } else {
+                    res.redirect('/myItems');
+                }
+            });
+        } else if(req.query.action == 'delete') {
+            deleteItemFromProfile(req.session.theUser._id, req.query.theItem, (err, profile) => {
+                if(!err) {
+                    req.session.currentProfile = profile;
+
+                    updateSwaps(req.session.theUser._id, req.query.theItem, (err) => {
+                        if(!err) {
+                            getSwapsQuery(req.session.theUser._id, (err, doc) => {
+                                if(!err) {
+                                    req.session.currentSwaps = doc;
+                                    var items = req.session.currentProfile.userItems;
+                                    res.render('myItems', { title: "CDXchange | My CDs", items: items });
+                                } else {
+                                    res.redirect('/myItems');
+                                }
+                            }) 
+                            
+                        } else {
+                            res.redirect('/myItems');
+                        }
+                    });
+                } else {
+                    res.redirect('/myItems');
+                }
+            });
         }
-    }
-
-    if(req.session.currentProfile) {
-        var items = req.session.currentProfile.userItems;
     } else {
-        var items = undefined;
-    }
+        if(req.session.currentProfile) {
+            var items = req.session.currentProfile.userItems;
+        } else {
+            var items = undefined;
+        }
 
-    res.render('myItems', { title: "CDXchange | My CDs", items: items });
+        res.render('myItems', { title: "CDXchange | My CDs", items: items });
+    }
 });
 
 app.get('/mySwaps', (req, res) => {
-    if(req.session.currentProfile) {
-        console.log(req.session.currentSwaps);
+    if(req.session.currentProfile && req.query.action && req.query.theItem ) {
+        if(req.query.action == 'offer') {
+            getItem(req.query.theItem, (err, item) => {
+                var swappableItems = new Array();
+
+                for(var i = 0; i < req.session.currentSwaps; i++) {
+                    if(req.session.currentSwaps[i].status == 'Available') {
+                        swappableItems.push(req.session.currentSwaps[i]);
+                    }
+                }
+
+                res.render('swap', { title: "CDXchange | Swap " + item.itemName, item: item, swappableItems: swappableItems });
+            });
+        }
+    } else if(req.session.currentProfile) {
         let mySwaps = req.session.currentSwaps;
         res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps });
     } else {
@@ -83,15 +125,6 @@ app.get('/mySwaps', (req, res) => {
 
 // --- FUNCTIONS ---
 // Validates that the item exists in the database.
-function validateItem(item) {
-    ItemModel.countDocuments({}, function(err, count) {
-        if(count != 0) {
-            return true;
-        } else {
-            return false;
-        }
-    })
-}
 
 function getUserQuery(callback) {
     UserModel.findOne( {}, function(err, doc) {
@@ -127,21 +160,83 @@ function getSwapsQuery(id, callback) {
 }
 
 function deleteItemFromProfile(id, item, callback) {
-    UserProfileModel.find( { _userId: id }, (err, doc) => {
-        let userItemsHolder = doc.userItems;
+    UserProfileModel.findOne( { _userId: id }, (err, doc) => {
 
-        let index = userItemsHolder.indexOf(item);
+        // If profile is found...
+        if(doc) {
+            var newUserItems = new Array();
 
-        if(index > -1) {
-            userItemsHolder.splice(index, 1);
-        }
-
-        UserProfileModel.updateOne( { _userId: id }, { userItems: userItemsHolder }, (err, num) => {
-            if(!err) {
-                callback(null);
-            } else {
-                callback(true);
+            for(var i = 0; i < doc.userItems.length; i++) {
+                if(doc.userItems[i]._id != item) {
+                    newUserItems.push(doc.userItems[i]);
+                }
             }
-        })
+
+            console.log(newUserItems);
+
+            // Update the profile.
+            UserProfileModel.updateOne( { _userId: id }, { userItems: newUserItems }, (err, raw) => {
+                        
+                UserProfileModel.findOne( { _userId: id }, (err, doc) => {
+                    if(doc) {
+                        callback(null, doc);
+                    } else {
+                        callback(true, null);
+                    }
+                });
+
+            });
+
+        } else {
+            console.error(err);
+            callback(true, null);
+        }
+    });
+}
+
+function updateSwaps(id, item, callback) {
+    SwapModel.find( { _userId: id }, (err, doc) => {
+        if(doc) {
+            var swapsToBeRemoved = new Array();
+
+            for(var i = 0; i < doc.length; i++) {
+                if(doc[i].item._id == item) {
+                    swapsToBeRemoved.push(doc[i]._id);
+                }
+            }
+
+            SwapModel.deleteMany( { _id: swapsToBeRemoved }, (err) => {
+                if(err) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            });
+        } else {
+            callback(true);
+        }
+    });
+}
+
+function getSwap(id, item, callback) {
+    var swapId = id + '-' + item;
+
+    SwapModel.findOne( { _id: swapId }, (err, doc) => {
+        console.log(doc);
+        if(doc) {
+            callback(null, doc);
+        } else {
+            callback(true, null);
+        }
+    });
+}
+
+function getItem(item, callback) {
+    ItemModel.findOne( { _id: item }, (err, doc) => {
+        if(doc) {
+            callback(null, doc);
+        } else {
+            callback(true, null);
+        }
     });
 }

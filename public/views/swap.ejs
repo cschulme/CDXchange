@@ -18,38 +18,38 @@
                 <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
                 <a href="/" class="button__bar">Home</a> > 
                 <a href="/categories" class="button__bar">Categories</a> >
-                <a href="/categories/<%= category %>" class="button__bar"><%= category %></a> >
-                <a href="/categories/<%= category %>/<%= items[0].itemCode %>" class="button__bar"><%= items[0].itemName %></a> >
-                <a href="/categories/<%= category %>/<%= items[0].itemCode %>/swap" class="button__bar">Swap</a>
+                <a href="/categories/<%= item.catalogCategory %>" class="button__bar"><%= item.catalogCategory %></a> >
+                <a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar"><%= item.itemName %></a> >
+                <a href="/categories/<%= item.catalogCategory %>/<%= item._id %>/swap" class="button__bar">Swap</a>
             </section>
             <section class="content__shell">
                 <div class="content__wrapper">
                     <h2 class="section--header">Swap this CD...</h2>
                     <br>
                     <div class="album-content__info album-content__info--small">
-                        <img src="<%= items[0].imageURL %>" alt="<%= items[0].itemName %> Album Cover" class="album-content__info--image">
+                        <img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="album-content__info--image">
                         <div class="album-content__info--data">
                             <div class="album-content__info--data-header">
-                                <h2><%= items[0].itemName %></h2>
+                                <h2><%= item.itemName %></h2>
                                 <span class="rating">
-                                    <% for(var j = 1; j <= items[0].rating; j++) { %>
+                                    <% for(var j = 1; j <= item.rating; j++) { %>
                                         <i class="fas fa-star checked"></i>
                                     <% } %>
-                                    <% for(var j = 5; j > items[0].rating; j--) { %>
+                                    <% for(var j = 5; j > item.rating; j--) { %>
                                         <i class="fas fa-star"></i>
                                     <% } %>
                                 </span>
                             </div>
-                            <h3><%= items[0].artist %> | <%= items[0].year %> | &copy; <%= items[0].recordLabel %></h3>
+                            <h3><%= item.artist %> | <%= item.year %> | &copy; <%= item.recordLabel %></h3>
                             <p>
-                                <%= items[0].description %>
+                                <%= item.description %>
                             </p>
                         </div>
                     </div>
                     <br>
                     <h2 class="section--header">...for one of yours:</h2>
                     <br>
-                    <% if(typeof myItems !== 'undefined') { %>
+                    <% if(typeof swappableItems !== 'undefined' && swappableItems.length > 0) { %>
                         <form>
                             <table>
                                 <tr>
@@ -60,10 +60,10 @@
                                     <th>Category</th>
                                     <th>Rating</th>
                                 </tr>
-                                <% myItems.forEach(function(myItem){ %>
+                                <% swappableItems.forEach(function(myItem){ %>
                                     <tr>
-                                        <td><input type="radio" name="swappedAlbum" value="<%= myItem.itemCode %>" class="form__radio-button"></td>
-                                        <td><a href="/categories/<%= myItem.catalogCategory %>/<%= myItem.itemCode %>" class="button__bar button__bar--small"><%= myItem.itemName %></a></td>
+                                        <td><input type="radio" name="swappedAlbum" value="<%= myItem._id %>" class="form__radio-button"></td>
+                                        <td><a href="/categories/<%= myItem.catalogCategory %>/<%= myItem._id %>" class="button__bar button__bar--small"><%= myItem.itemName %></a></td>
                                         <td><a href="/artists" class="button__bar button__bar--small"><%= myItem.artist %></a></td>
                                         <td><%= myItem.year %></td>
                                         <td><a href="/categories/<%= myItem.catalogCategory %>" class="button__bar button__bar--small"><%= myItem.catalogCategory %></a></td>
@@ -85,6 +85,8 @@
                             <br>
                             <br>
                         </form>
+                    <% } else if( theUser.user == true) { %>
+                        <h3>There are no items to show!  Add some items to your account to swap.</h3>
                     <% } else { %>
                         <h3>There are no items to show!  Please log in.</h3>
                     <% } %>
