@@ -12,9 +12,17 @@ app.get('/categories', function (req, res) {
 app.get('/categories/:category', function (req, res) {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
-    if(utilityFunctions.validateCategory(category) == true) {
-        ItemModel.find( { catalogCategory: category } ).then(function(doc) {
-            res.render('category', { title: "CDXchange | " + category, category: category, items: doc});
+    if(utilityFunctions.validateCategory(category) == true && req.session.currentProfile) {
+        findItemsNotOwned(req.session.currentProfile.userItems, category, (err, items) => {
+            if(!err) {
+                res.render('category', { title: "CDXchange | " + category, category: category, items: items})
+            } else {
+                res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
+            }
+        });
+    } else if(utilityFunctions.validateCategory(category)) {
+        ItemModel.find( { catalogCategory: category }, (err, items) => {
+            res.render('category', { title: "CDXchange | " + category, category: category, items: items});
         });
     } else {
         res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
@@ -40,3 +48,20 @@ app.get('/categories/:category/:item', function (req, res) {
         res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
     }
 });
+
+// --- FUNCTIONS ---
+function findItemsNotOwned(userItems, category, callback) {
+    let userItemIds = new Array();
+
+    for(let i = 0; i < userItems.length; i++) {
+        userItemIds.push(userItems[i]._id);
+    }
+
+    ItemModel.find( { _id: { $nin: userItemIds }, catalogCategory: category }, (err, doc) => {
+        if(doc) {
+            callback(null, doc);
+        } else {
+            callback(true, null);
+        }
+    });
+}

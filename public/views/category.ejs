@@ -28,31 +28,37 @@
                     </div>
                 </div>
                 <div id="categoryList">
-                    <table>
-                        <tr>
-                            <th>Album</th>
-                            <th>Artist</th>
-                            <th>Year</th>
-                            <th>Rating</th>
-                        </tr>
-                        <% items.forEach( function(item) { %>
+                    <% if(items.length > 0) { %>
+                        <table>
                             <tr>
-                                <td><a href="/categories/<%= category %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
-                                <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
-                                <td><%= item.year %></td>
-                                <td>
-                                    <span class="rating">
-                                        <% for(var j = 1; j <= item.rating; j++) { %>
-                                            <i class="fas fa-star checked"></i>
-                                        <% } %>
-                                        <% for(var j = 5; j > item.rating; j--) { %>
-                                            <i class="fas fa-star"></i>
-                                        <% } %>
-                                    </span>
-                                </td>
+                                <th>Album</th>
+                                <th>Artist</th>
+                                <th>Year</th>
+                                <th>Rating</th>
                             </tr>
-                        <% }); %>
-                    </table>
+                            <% items.forEach( function(item) { %>
+                                <tr>
+                                    <td><a href="/categories/<%= category %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                    <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
+                                    <td><%= item.year %></td>
+                                    <td>
+                                        <span class="rating">
+                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                                <i class="fas fa-star checked"></i>
+                                            <% } %>
+                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                                <i class="fas fa-star"></i>
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                    <% } else if( theUser.user == true ) { %>
+                        <h3>Looks like you own every CD in this category!</h3>
+                    <% } else { %>
+                        <h3>No CDs available at this time, sorry!</h3>
+                    <% } %>
                 </div>
             </section>
         </main>
