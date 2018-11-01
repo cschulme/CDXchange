@@ -141,6 +141,12 @@ button:hover {
     background-color: rgb(2, 211, 176);
 }
 
+.button__bubble--inactive {
+    border: 3px solid rgb(146, 146, 146);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 
 
 /* === TABLES === */

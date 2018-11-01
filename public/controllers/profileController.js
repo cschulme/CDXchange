@@ -105,7 +105,7 @@ app.get('/mySwaps', (req, res) => {
             getItem(req.query.theItem, (err, item) => {
                 var swappableItems = new Array();
 
-                for(var i = 0; i < req.session.currentSwaps; i++) {
+                for(var i = 0; i < req.session.currentSwaps.length; i++) {
                     if(req.session.currentSwaps[i].status == 'Available') {
                         swappableItems.push(req.session.currentSwaps[i]);
                     }

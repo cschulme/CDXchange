@@ -42,7 +42,11 @@
                             <p>
                                 <%= item.description %>
                             </p>
-                            <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It</a>
+                            <% if(owned == false) { %>
+                                <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It</a>
+                            <% } else { %>
+                                <span class="button__bubble--medium button__bubble--inactive">You own this item</span>
+                            <% } %>
                             <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
                         </div>
                     </div>

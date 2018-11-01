@@ -61,23 +61,25 @@
                                     <th>Rating</th>
                                 </tr>
                                 <% swappableItems.forEach(function(myItem){ %>
-                                    <tr>
-                                        <td><input type="radio" name="swappedAlbum" value="<%= myItem._id %>" class="form__radio-button"></td>
-                                        <td><a href="/categories/<%= myItem.catalogCategory %>/<%= myItem._id %>" class="button__bar button__bar--small"><%= myItem.itemName %></a></td>
-                                        <td><a href="/artists" class="button__bar button__bar--small"><%= myItem.artist %></a></td>
-                                        <td><%= myItem.year %></td>
-                                        <td><a href="/categories/<%= myItem.catalogCategory %>" class="button__bar button__bar--small"><%= myItem.catalogCategory %></a></td>
-                                        <td>
-                                            <span class="rating">
-                                                <% for(var j = 1; j <=  myItem.rating; j++) { %>
-                                                    <i class="fas fa-star checked"></i>
-                                                <% } %>
-                                                <% for(var j = 5; j > myItem.rating; j--) { %>
-                                                    <i class="fas fa-star"></i>
-                                                <% } %>
-                                            </span>
-                                        </td>
-                                    </tr>
+                                    <% if(myItem.item._id != item._id) { %>
+                                        <tr>
+                                            <td><input type="radio" name="swappedAlbum" value="<%= myItem.item._id %>" class="form__radio-button"></td>
+                                            <td><a href="/categories/<%= myItem.item.catalogCategory %>/<%= myItem.item._id %>" class="button__bar button__bar--small"><%= myItem.item.itemName %></a></td>
+                                            <td><a href="/artists" class="button__bar button__bar--small"><%= myItem.item.artist %></a></td>
+                                            <td><%= myItem.item.year %></td>
+                                            <td><a href="/categories/<%= myItem.item.catalogCategory %>" class="button__bar button__bar--small"><%= myItem.item.catalogCategory %></a></td>
+                                            <td>
+                                                <span class="rating">
+                                                    <% for(var j = 1; j <=  myItem.item.rating; j++) { %>
+                                                        <i class="fas fa-star checked"></i>
+                                                    <% } %>
+                                                    <% for(var j = 5; j > myItem.item.rating; j--) { %>
+                                                        <i class="fas fa-star"></i>
+                                                    <% } %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% } %>
                                 <% }); %>
                             </table>
                             <br>
