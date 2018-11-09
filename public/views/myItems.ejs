@@ -23,43 +23,45 @@
                 <div class="content__wrapper">
                     <h2 class="section--header">Your CDs for Swap</h2>
                     <% if(typeof items !== 'undefined') { %>
-                    <table>
-                        <tr>
-                            <th>Album</th>
-                            <th>Artist</th>
-                            <th>Year</th>
-                            <th>Category</th>
-                            <th>Rating</th>
-                            <th></th>
-                        </tr>
-                        <% items.forEach(function(item) {%>
+                        <table>
                             <tr>
-                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
-                                <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
-                                <td><%= item.year %></td>
-                                <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
-                                <td>
-                                    <span class="rating">
-                                        <% for(var j = 1; j <= item.rating; j++) { %>
-                                            <i class="fas fa-star checked"></i>
-                                        <% } %>
-                                        <% for(var j = 5; j > item.rating; j--) { %>
-                                            <i class="fas fa-star"></i>
-                                        <% } %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="/myItems?action=update&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Update</a>
-                                    <a href="/myItems?action=delete&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Delete</a>
-                                </td>
+                                <th>Album</th>
+                                <th>Artist</th>
+                                <th>Year</th>
+                                <th>Category</th>
+                                <th>Rating</th>
+                                <th></th>
                             </tr>
-                        <% }); %>
-                    </table>
+                            <% items.forEach(function(item) {%>
+                                <tr>
+                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                    <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
+                                    <td><%= item.year %></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                    <td>
+                                        <span class="rating">
+                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                                <i class="fas fa-star checked"></i>
+                                            <% } %>
+                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                                <i class="fas fa-star"></i>
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="/myItems?action=update&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Update</a>
+                                        <a href="/myItems?action=delete&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Delete</a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                        <br>
+                        <a href="#" class="button__bubble button__bubble--medium">Add another CD</a>
                     <% } else if (theUser.user == true) { %>
-                        <h3>There's no items to show!  Time to start adding some items to your account!</h3>
-                        <a href="#" class="button__bubble button__bubble--medium">Add some items</a>
+                        <h3>There's no CDs to show!  Time to start adding some CDs to your account!</h3>
+                        <a href="#" class="button__bubble button__bubble--medium">Add a CD</a>
                     <% } else { %>
-                        <h3>There's no items to show!  Please log in.</h3>
+                        <h3>There's no CDs to show!  Please log in.</h3>
                     <% } %>
                 </div>
             </section>

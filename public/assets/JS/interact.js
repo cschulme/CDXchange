@@ -23,8 +23,12 @@ $(document).ready(function() {
         $('.modal__sign-in').addClass("modal--show");
     });
 
-    $('.modal__sign-in--close').click(function() {
-        $('.modal__sign-in').removeClass("modal--show");
+    $('.modal__swaps--trigger').click(function() {
+        $('.modal__swaps').addClass("modal--show");
+    });
+
+    $('.modal--close').click(function() {
+        $('.modal').removeClass("modal--show");
     });
 
     $('.modal').mousedown(function(e) {

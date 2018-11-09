@@ -37,21 +37,25 @@
                                     <% } %>
                                 </span>
                             </div>
-                            <h3><%= item.artist %></h3>
+                            <h3><a href="/artists" class="button__bar" style="text-transform: none"><%= item.artist %></a></h3>
                             <h3><%= item.year %> | &copy; <%= item.recordLabel %></h3>
                             <p>
                                 <%= item.description %>
                             </p>
-                            <% if(owned == false) { %>
-                                <% if(count > 0) { %>
-                                    <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It (<%= count %> Available)</a>
-                                <% } else { %> 
-                                    <span class="button__bubble--medium button__bubble--inactive">None available at this time</span>
+                            <% if(theUser.user == true) { %>
+                                <% if(owned == false) { %>
+                                    <% if(swaps.length > 0) { %>
+                                        <button class="button__bubble button__bubble--medium modal__swaps--trigger">Swap It (<%= swaps.length %> Available)</button>
+                                    <% } else { %> 
+                                        <span class="button__bubble--medium button__bubble--inactive">None available at this time</span>
+                                    <% } %>
+                                <% } else { %>
+                                    <span class="button__bubble--medium button__bubble--inactive">You own this item</span>
                                 <% } %>
+                                <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
                             <% } else { %>
-                                <span class="button__bubble--medium button__bubble--inactive">You own this item</span>
+                                <span class="button__bubble--medium button__bubble--inactive">Please login to swap or rate</span>
                             <% } %>
-                            <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
                         </div>
                     </div>
                     <div class="album-content__tracks">
@@ -90,5 +94,34 @@
         </main>
         
         <%- include partials/footer.ejs %>
+
+        <!-- SWAPS MODAL -->
+        <% if(swaps.length > 0) { %>
+            <div class="modal modal__swaps">
+                <div class="modal--content modal__swaps--content">
+                    <span class="modal--close">&times;</span>
+                    <h2>Select Swap:</h2>
+                    <table class="swap-select__table">
+                        <tr>
+                            <th colspan="2">Album</th>
+                            <th>User</th>
+                            <th style="text-align: center"><i class="fas fa-exchange-alt"></i></th>
+                        </tr>
+                        <% for(var i = 0; i < swaps.length; i++) { %>
+                            <tr>
+                                <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                <td><%= swaps[i].item.artist %> - <%= swaps[i].item.itemName %></td>   
+                                <% for(var j = 0; j < swapUsers.length; j++) { %>
+                                    <% if(swapUsers[j]._id == swaps[i]._userId) { %>
+                                        <td><%= swapUsers[j].fullName %></td>
+                                    <% } %>
+                                <% } %>
+                                <td style="text-align: center;"><a href="/myswaps?action=offer&theSwap=<%= swaps[i]._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                            </tr>
+                        <% } %>
+                    </table>
+                </div>
+            </div>
+        <% } %>
     </body>
 </html>

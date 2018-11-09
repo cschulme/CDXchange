@@ -100,11 +100,11 @@ app.get('/myitems', function(req, res) {
 });
 
 app.get('/myswaps', (req, res) => {
-    if(req.session.currentProfile && req.query.action && req.query.theItem ) {
+    if(req.session.currentProfile && req.query.action && req.query.theSwap) {
         if(req.query.action == 'offer') {
-            ItemModel.findOne( { _id: req.query.theItem } )
+            SwapModel.findOne( { _id: req.query.theSwap } )
                 .then(
-                    (item) => {
+                    (swap) => {
                         var swappableItems = new Array();
 
                         for(var i = 0; i < req.session.currentSwaps.length; i++) {
@@ -112,8 +112,7 @@ app.get('/myswaps', (req, res) => {
                                 swappableItems.push(req.session.currentSwaps[i]);
                             }
                         }
-
-                        res.render('swap', { title: "CDXchange | Swap " + item.itemName, item: item, swappableItems: swappableItems });
+                        res.render('swap', { title: "CDXchange | Swap " + swap.item.itemName, swap: swap, swappableItems: swappableItems });
                     }, (err) => {
                         console.error(err);
                         res.redirect('/myitems');
@@ -128,8 +127,21 @@ app.get('/myswaps', (req, res) => {
         SwapModel.find( { _userId: { $ne: req.session.theUser._id } })
             .then(
                 (otherSwaps) => {
-                    let mySwaps = req.session.currentSwaps;
-                    res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps, otherSwaps: otherSwaps });
+                    var userIds = new Array();
+
+                    otherSwaps.forEach((swap) => {
+                        userIds.push(swap._userId);
+                    });
+
+                    UserModel.find( { _id: { $in: userIds } }, (err, swapUsers) => {
+                        if(!err) {
+                            let mySwaps = req.session.currentSwaps;
+                            res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps, otherSwaps: otherSwaps, swapUsers: swapUsers });
+                        } else {
+                            console.error(err);
+                            res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps});
+                        }
+                    });
                 }, (err) => {
                     console.error(err);
                     let mySwaps = req.session.currentSwaps;
@@ -142,7 +154,9 @@ app.get('/myswaps', (req, res) => {
     }
 });
 
-app.post('/')
+app.post('/createSwap', (req, res) => {
+
+});
 
 // --- FUNCTIONS ---
 // Validates that the item exists in the database.

@@ -3,6 +3,7 @@ const express = require('express');
 const app = module.exports = express();
 const ItemModel = require('../models/item');
 const SwapModel = require('../models/swap');
+const UserModel = require('../models/user');
 const utilityFunctions = require('../utilityFunctions');
 
 // --- ROUTES ---
@@ -45,9 +46,21 @@ app.get('/categories/:category/:item', function (req, res) {
                 }
             }
 
-            SwapModel.count( { 'item._id': req.params.item }, (err, count) => {
-                if(!err) { 
-                    res.render('item', { title: "CDXchange | " + item.itemName, item: item, owned: owned, count: count });
+            SwapModel.find( { 'item._id': req.params.item }, (err, swaps) => {
+                if(!err) {
+                    var userIds = new Array();                    
+                    
+                    swaps.forEach((swap) => {
+                        userIds.push(swap._userId);
+                    })
+
+                    UserModel.find( { _id: { $in: userIds } }, (err, users) => {
+                        if(!err) {
+                            res.render('item', { title: "CDXchange | " + item.itemName, item: item, owned: owned, swaps: swaps, swapUsers: users });
+                        } else {
+                            console.error(err);
+                        }
+                    });
                 } else {
                     console.error(err);
                 }

@@ -157,7 +157,7 @@ button:hover {
     width: 100%;
     height: 100%;
     z-index: 100;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     opacity: 0;
     visibility: hidden;
     transform: scale(1.1);
@@ -169,18 +169,15 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-.modal__sign-in--content {
     color: white;
     background-color: white;
     padding: 20px;
     border-radius: 30px;
     background: linear-gradient(rgb(78, 78, 78), rgb(58, 58, 58));
-    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.8);
 }
 
-.modal__sign-in--close {
+.modal--close {
     float: right;
     
     display: flex;
@@ -196,7 +193,7 @@ button:hover {
     cursor: pointer;
 }
 
-.modal__sign-in--close:hover {
+.modal--close:hover {
     background-color: rgb(2, 211, 176);
 }
 
@@ -205,6 +202,10 @@ button:hover {
     visibility: visible;
     transform: scale(1.0);
     transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
+}
+
+.modal__swaps--trigger {
+    background: none;
 }
 
 
@@ -235,6 +236,16 @@ tr:first-of-type {
 td {
     border-bottom: 2px solid white;
     margin: 0;
+}
+
+.swap-select__table {
+    min-width: 700px;
+}
+
+.image-icon {
+    height: 35px;
+    width: 35px;
+    margin: 3px 0px 0px;
 }
 
 
@@ -285,18 +296,20 @@ td {
     display: grid;
 
     grid-template-columns: 150px 450px;
-    grid-template-rows: 50px 50px 50px 40px 120px;
+    grid-template-rows: 50px 50px 50px 40px 20px 120px;
     grid-template-areas:
         "sign-in__header sign-in__header"
         "label input"
         "label input"
         "submit submit"
+        "forgot forgot"
         "register register";
     grid-gap: 20px;
 }
 
 .sign-in__form h2 {
     grid-area: sign-in__header;
+    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
     text-align: center;
 }
 
@@ -305,6 +318,7 @@ td {
     font-size: 1.2rem;
     border: none;
     border-radius: 25px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
 .sign-in__form label {
@@ -312,6 +326,7 @@ td {
     align-items: center;
     justify-content: flex-end;
     font-size: 1.5rem;
+    text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -324,6 +339,15 @@ td {
     cursor: pointer;
 }
 
+.forgot {
+    grid-area: forgot;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0px 120px;
+}
+
 .sign-up {
     grid-area: register;
 
@@ -334,10 +358,14 @@ td {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
 .sign-up a {
     margin-top: 10px;
+
+    text-shadow: none;
 }
 
 .sign-up hr {
@@ -405,6 +433,9 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    position: relative;
+    z-index: 15;
 
     background: linear-gradient(rgb(35, 35, 35), black);
     box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.39);
