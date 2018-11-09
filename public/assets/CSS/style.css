@@ -149,6 +149,65 @@ button:hover {
 
 
 
+/* === MODALS === */
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.1);
+    transition: visibility 0s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+}
+
+.modal--content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.modal__sign-in--content {
+    color: white;
+    background-color: white;
+    padding: 20px;
+    border-radius: 30px;
+    background: linear-gradient(rgb(78, 78, 78), rgb(58, 58, 58));
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.6);
+}
+
+.modal__sign-in--close {
+    float: right;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 35px;
+    height: 35px;
+    font-size: 30px;
+
+    border: 3px solid rgb(2, 211, 176);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.modal__sign-in--close:hover {
+    background-color: rgb(2, 211, 176);
+}
+
+.modal--show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1.0);
+    transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
+}
+
+
 /* === TABLES === */
 
 table {
@@ -222,6 +281,73 @@ td {
      transition: all ease-in-out 0.3s;
 }
 
+.sign-in__form {
+    display: grid;
+
+    grid-template-columns: 150px 450px;
+    grid-template-rows: 50px 50px 50px 40px 120px;
+    grid-template-areas:
+        "sign-in__header sign-in__header"
+        "label input"
+        "label input"
+        "submit submit"
+        "register register";
+    grid-gap: 20px;
+}
+
+.sign-in__form h2 {
+    grid-area: sign-in__header;
+    text-align: center;
+}
+
+.sign-in__form input[type="text"], .sign-in__form input[type="password"] {
+    padding: 20px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 25px;
+}
+
+.sign-in__form label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.sign-in__form input[type="submit"] {
+    grid-area: submit;
+    display: flex;
+    align-self: center;
+    justify-self: center;
+    cursor: pointer;
+}
+
+.sign-up {
+    grid-area: register;
+
+    display: flex;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sign-up a {
+    margin-top: 10px;
+}
+
+.sign-up hr {
+    height: 3px;
+    border: 0;
+    background-color: rgb(2, 211, 176);
+    border-radius: 1.5px;
+    width: 80%;
+    margin-bottom: 20px;
+}
 
 
 /* === HEADER === */

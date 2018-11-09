@@ -3,7 +3,7 @@
         <% if(theUser.user == true) { %>
             <li><a href="/signout" class="button__bubble button__bubble--large">Sign Out</a></li>
         <% } else { %>
-            <li><a href="/signin" class="button__bubble button__bubble--large">Sign In</a></li>
+            <li><button class="button__bubble button__bubble--large modal__sign-in--trigger">Sign In</button></li>
         <% } %>
         <li><a href="/myitems" class="button__bubble button__bubble--large">My CDs</a></li>
         <li><a href="/myswaps" class="button__bubble button__bubble--large">My Swaps</a></li>
@@ -17,3 +17,24 @@
     </form>
     
 </nav>
+
+<div class="modal modal__sign-in">
+    <div class="modal--content modal__sign-in--content">
+        <span class="modal__sign-in--close">
+            &times;
+        </span>
+        <form method="GET" action="/signin" class="sign-in__form">
+            <h2>Sign In</h2>
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Not functional yet.">
+            <label for="password">Password</label>
+            <input type="password" name="password" placeholder="Not functional yet.">
+            <input type="submit" value="Sign In" class="button__bubble button__bubble--large">
+            <div class="sign-up">
+                <hr>
+                Not registered yet?
+                <a href="#" class="button__bubble button__bubble--large">Sign up</a>
+            </div>
+        </form>
+    </div>
+</div>
