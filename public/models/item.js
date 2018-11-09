@@ -16,7 +16,8 @@ const ItemSchema = new mongoose.Schema({
         type: Number,
         min: 0,
         max: 5
-    }
+    },
+    tracks: Array
 }, {
     toObject: {
         virtuals: true

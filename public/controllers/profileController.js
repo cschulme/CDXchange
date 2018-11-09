@@ -15,12 +15,12 @@ app.get('/signin', function(req, res) {
                 req.session.theUser = doc;
             }
 
-            getProfileQuery(req.session.theUser.id, (error, doc) => {
+            getProfileQuery(req.session.theUser._id, (error, doc) => {
                 if(!error) {
                     req.session.currentProfile = doc;
                 }
 
-                getSwapsQuery(req.session.theUser.id, (error, doc) => {
+                getSwapsQuery(req.session.theUser._id, (error, doc) => {
                     if(!error) {
                         req.session.currentSwaps = doc;
                     }
@@ -99,24 +99,43 @@ app.get('/myitems', function(req, res) {
     }
 });
 
-app.get('/mySwaps', (req, res) => {
+app.get('/myswaps', (req, res) => {
     if(req.session.currentProfile && req.query.action && req.query.theItem ) {
         if(req.query.action == 'offer') {
-            getItem(req.query.theItem, (err, item) => {
-                var swappableItems = new Array();
+            ItemModel.findOne( { _id: req.query.theItem } )
+                .then(
+                    (item) => {
+                        var swappableItems = new Array();
 
-                for(var i = 0; i < req.session.currentSwaps.length; i++) {
-                    if(req.session.currentSwaps[i].status == 'Available') {
-                        swappableItems.push(req.session.currentSwaps[i]);
+                        for(var i = 0; i < req.session.currentSwaps.length; i++) {
+                            if(req.session.currentSwaps[i].status == 'Available') {
+                                swappableItems.push(req.session.currentSwaps[i]);
+                            }
+                        }
+
+                        res.render('swap', { title: "CDXchange | Swap " + item.itemName, item: item, swappableItems: swappableItems });
+                    }, (err) => {
+                        console.error(err);
+                        res.redirect('/myitems');
                     }
-                }
+                );
+        } else if (req.query.action == 'withdraw') {
 
-                res.render('swap', { title: "CDXchange | Swap " + item.itemName, item: item, swappableItems: swappableItems });
-            });
+        } else {
+            res.redirect('/mySwaps');
         }
     } else if(req.session.currentProfile) {
-        let mySwaps = req.session.currentSwaps;
-        res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps });
+        SwapModel.find( { _userId: { $ne: req.session.theUser._id } })
+            .then(
+                (otherSwaps) => {
+                    let mySwaps = req.session.currentSwaps;
+                    res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps, otherSwaps: otherSwaps });
+                }, (err) => {
+                    console.error(err);
+                    let mySwaps = req.session.currentSwaps;
+                    res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps});
+                }
+            );
     } else {
         let mySwaps = undefined;
         res.render('mySwaps', { title: "CDXchange | My Swaps", mySwaps: mySwaps });
@@ -171,8 +190,6 @@ function deleteItemFromProfile(id, item, callback) {
                     newUserItems.push(doc.userItems[i]);
                 }
             }
-
-            console.log(newUserItems);
 
             // Update the profile.
             UserProfileModel.updateOne( { _userId: id }, { userItems: newUserItems }, (err, raw) => {

@@ -50,7 +50,7 @@
                     <h2 class="section--header">...for one of yours:</h2>
                     <br>
                     <% if(typeof swappableItems !== 'undefined' && swappableItems.length > 0) { %>
-                        <form>
+                        <form action='/createSwap' method="POST">
                             <table>
                                 <tr>
                                     <th>Select</th>

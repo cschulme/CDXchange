@@ -40,7 +40,20 @@
                                         <td><a href="/mySwaps?action=withdraw&theItem=<%= swap.item._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
                                 <% } %>
-                            <% }) %>
+                            <% }); %>
+                            
+                            <% if(typeof otherSwaps !== 'undefined') { %>
+                                <% otherSwaps.forEach(function(swap) { %>
+                                    <% if(swap.status == 'Available') { %>
+                                        <tr>
+                                            <td>---</td>
+                                            <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
+                                            <td>Available</td>
+                                            <td><a href="/mySwaps?action=offer&theItem=<%= swap.item._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                                        </tr>
+                                    <% } %>
+                                <% }); %>
+                            <% } %>
                         </table>
                     <% } else if (theUser.user == true) { %>
                         <h3>There's no items to show!  Time to start adding some items to your account!</h3>

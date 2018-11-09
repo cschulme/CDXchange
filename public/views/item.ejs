@@ -29,10 +29,10 @@
                             <div class="album-content__info--data-header">
                                 <h2><%= item.itemName %></h2>
                                 <span class="rating">
-                                    <% for(var j = 1; j <= item.rating; j++) { %>
+                                    <% for(let j = 1; j <= item.rating; j++) { %>
                                         <i class="fas fa-star checked"></i>
                                     <% } %>
-                                    <% for(var j = 5; j > item.rating; j--) { %>
+                                    <% for(let j = 5; j > item.rating; j--) { %>
                                         <i class="fas fa-star"></i>
                                     <% } %>
                                 </span>
@@ -43,7 +43,11 @@
                                 <%= item.description %>
                             </p>
                             <% if(owned == false) { %>
-                                <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It</a>
+                                <% if(count > 0) { %>
+                                    <a href="/mySwaps?action=offer&theItem=<%= item._id %>" class="button__bubble button__bubble--medium">Swap It (<%= count %> Available)</a>
+                                <% } else { %> 
+                                    <span class="button__bubble--medium button__bubble--inactive">None available at this time</span>
+                                <% } %>
                             <% } else { %>
                                 <span class="button__bubble--medium button__bubble--inactive">You own this item</span>
                             <% } %>
@@ -51,92 +55,34 @@
                         </div>
                     </div>
                     <div class="album-content__tracks">
-                        <table>
-                            <tr>
-                                <th>#</th>
-                                <th>Title</th>
-                                <th>Artist</th>
-                                <th><i class="fas fa-clock"></i></th>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>Welcome To New York</td>
-                                <td>Taylor Swift</td>
-                                <td>3:32</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Blank Space</td>
-                                <td>Taylor Swift</td>
-                                <td>3:51</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Style</td>
-                                <td>Taylor Swift</td>
-                                <td>3:51</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>Out of the Woods</td>
-                                <td>Taylor Swift</td>
-                                <td>3:55</td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>All You Had To Do Was Stay</td>
-                                <td>Taylor Swift</td>
-                                <td>3:13</td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td>Shake It Off</td>
-                                <td>Taylor Swift</td>
-                                <td>3:39</td>
-                            </tr>
-                            <tr>
-                                <td>7</td>
-                                <td>I Wish You Would</td>
-                                <td>Taylor Swift</td>
-                                <td>3:27</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>Bad Blood</td>
-                                <td>Taylor Swift</td>
-                                <td>3:31</td>
-                            </tr>
-                            <tr>
-                                <td>9</td>
-                                <td>Wildest Dreams</td>
-                                <td>Taylor Swift</td>
-                                <td>3:40</td>
-                            </tr>
-                            <tr>
-                                <td>10</td>
-                                <td>How You Get The Girl</td>
-                                <td>Taylor Swift</td>
-                                <td>4:07</td>
-                            </tr>
-                            <tr>
-                                <td>11</td>
-                                <td>This Love</td>
-                                <td>Taylor Swift</td>
-                                <td>4:10</td>
-                            </tr>
-                            <tr>
-                                <td>12</td>
-                                <td>I Know Places</td>
-                                <td>Taylor Swift</td>
-                                <td>3:15</td>
-                            </tr>
-                            <tr>
-                                <td>13</td>
-                                <td>Clean</td>
-                                <td>Taylor Swift</td>
-                                <td>4:31</td>
-                            </tr>
-                        </table>
+                        <% if(item.tracks.length != 0) { %>
+                            <table>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Artist</th>
+                                    <th><i class="fas fa-clock"></i></th>
+                                </tr>
+                                <% item.tracks.forEach((track) => { %>
+                                    <tr>
+                                        <td><%= track.number %></td>
+                                        <td><%= track.title %></td>
+                                        <td>
+                                            <% for(let i = 0; i < track.artists.length; i++) { %>
+                                                <% if(i + 1 == track.artists.length) { %>
+                                                    <%= track.artists[i] %>
+                                                <% } else { %>
+                                                    <%= track.artists[i] + ', ' %>
+                                                <% } %>
+                                            <% } %>
+                                        </td>
+                                        <td><%= track.length %></td>
+                                    </tr>
+                                <% }); %>
+                            </table>
+                        <% } else { %>
+                            <h3>No track information available at this time.</h3>
+                        <% } %>  
                     </div>
                 </div>
             </section>

@@ -2,6 +2,7 @@
 const express = require('express');
 const app = module.exports = express();
 const ItemModel = require('../models/item');
+const SwapModel = require('../models/swap');
 const utilityFunctions = require('../utilityFunctions');
 
 // --- ROUTES ---
@@ -33,16 +34,24 @@ app.get('/categories/:category/:item', function (req, res) {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
     if(utilityFunctions.validateCategory(category) == true) {
-        ItemModel.findById(req.params.item).then(function(item) {
+        ItemModel.findById(req.params.item).then((item) => {
             var owned = false;
 
-            for(var i = 0; i < req.session.currentProfile.userItems.length; i++) {
-                if(item._id == req.session.currentProfile.userItems[i]._id) {
-                    owned = true;
+            if(typeof req.session.currentProfile !== 'undefined') {
+                for(var i = 0; i < req.session.currentProfile.userItems.length; i++) {
+                    if(item._id == req.session.currentProfile.userItems[i]._id) {
+                        owned = true;
+                    }
                 }
             }
 
-            res.render('item', { title: "CDXchange | " + item.itemName, item: item, owned: owned });
+            SwapModel.count( { 'item._id': req.params.item }, (err, count) => {
+                if(!err) { 
+                    res.render('item', { title: "CDXchange | " + item.itemName, item: item, owned: owned, count: count });
+                } else {
+                    console.error(err);
+                }
+            });
         });
     } else {
         res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
