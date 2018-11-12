@@ -39,6 +39,10 @@ app.use(profileController);
 app.use(catalogController);
 
 // 404 Route
+app.get('/404', (req, res) => {
+    res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
+});
+
 app.use(function(req, res, next) {
     res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
 });

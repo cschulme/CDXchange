@@ -10,7 +10,7 @@ const SwapSchema = new mongoose.Schema({
     userRating: Number,
     status: String,
     _swapUserId: Number,
-    swapItem: String,
+    swapItem: Object,
     swapItemRating: Number,
     swapUserRating: Number
 

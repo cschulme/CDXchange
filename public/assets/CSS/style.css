@@ -4,6 +4,10 @@
     transition: all ease-in-out 0.3s;
 }
 
+button:hover, input[type="submit"]:hover, a:hover {
+    cursor: pointer;
+}
+
 body, .nav-expanded {
     height: 100vh;
     width: 100vw;
@@ -28,7 +32,6 @@ body, .nav-expanded {
         "general-nav__collapsed main"
         "footer footer";
 }
-
 
 
 /* === GENERAL TYPOGRAPHY === */
@@ -145,6 +148,7 @@ button:hover {
     border: 3px solid rgb(146, 146, 146);
     font-weight: bold;
     text-transform: uppercase;
+    cursor: default !important;
 }
 
 
@@ -204,10 +208,31 @@ button:hover {
     transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
 }
 
-.modal__swaps--trigger {
+.modal__select--trigger {
     background: none;
 }
 
+.modal__select--content {
+    display: grid;
+    grid-template-rows: 50px 1fr;
+    grid-template-areas:
+        "select-header"
+        "select-table";
+    grid-gap: 10px;
+
+    min-width: 800px;
+    max-height: 70vh;
+    padding: 30px;
+}
+
+.modal__select--header {
+    grid-area: select-header;
+}
+
+.modal__select--table-container {
+    grid-area: select-table;
+    overflow: auto;
+}
 
 /* === TABLES === */
 
@@ -238,8 +263,8 @@ td {
     margin: 0;
 }
 
-.swap-select__table {
-    min-width: 700px;
+.item-select__table {
+    width: 100%;
 }
 
 .image-icon {

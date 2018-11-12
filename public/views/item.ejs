@@ -45,7 +45,7 @@
                             <% if(theUser.user == true) { %>
                                 <% if(owned == false) { %>
                                     <% if(swaps.length > 0) { %>
-                                        <button class="button__bubble button__bubble--medium modal__swaps--trigger">Swap It (<%= swaps.length %> Available)</button>
+                                        <button class="button__bubble button__bubble--medium modal__select--trigger">Swap It (<%= swaps.length %> Available)</button>
                                     <% } else { %> 
                                         <span class="button__bubble--medium button__bubble--inactive">None available at this time</span>
                                     <% } %>
@@ -97,29 +97,33 @@
 
         <!-- SWAPS MODAL -->
         <% if(swaps.length > 0) { %>
-            <div class="modal modal__swaps">
-                <div class="modal--content modal__swaps--content">
-                    <span class="modal--close">&times;</span>
-                    <h2>Select Swap:</h2>
-                    <table class="swap-select__table">
-                        <tr>
-                            <th colspan="2">Album</th>
-                            <th>User</th>
-                            <th style="text-align: center"><i class="fas fa-exchange-alt"></i></th>
-                        </tr>
-                        <% for(var i = 0; i < swaps.length; i++) { %>
-                            <tr>
-                                <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
-                                <td><%= swaps[i].item.artist %> - <%= swaps[i].item.itemName %></td>   
-                                <% for(var j = 0; j < swapUsers.length; j++) { %>
-                                    <% if(swapUsers[j]._id == swaps[i]._userId) { %>
-                                        <td><%= swapUsers[j].fullName %></td>
-                                    <% } %>
+            <div class="modal modal__select">
+                <div class="modal--content modal__select--content">
+                    <div class="modal__select--header">
+                        <span class="modal--close">&times;</span>
+                        <h2>Select Swap:</h2>
+                    </div>
+                    <div class="modal__select--table-container">
+                        <table class="item-select__table">
+                                <tr>
+                                    <th colspan="2">Album</th>
+                                    <th>User</th>
+                                    <th style="text-align: center"><i class="fas fa-exchange-alt"></i></th>
+                                </tr>
+                                <% for(var i = 0; i < swaps.length; i++) { %>
+                                    <tr>
+                                        <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                        <td><%= swaps[i].item.artist %> - <%= swaps[i].item.itemName %></td>   
+                                        <% for(var j = 0; j < swapUsers.length; j++) { %>
+                                            <% if(swapUsers[j]._id == swaps[i]._userId) { %>
+                                                <td><%= swapUsers[j].fullName %></td>
+                                            <% } %>
+                                        <% } %>
+                                        <td style="text-align: center"><a href="/myswaps?action=offer&theSwap=<%= swaps[i]._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                                    </tr>
                                 <% } %>
-                                <td style="text-align: center;"><a href="/myswaps?action=offer&theSwap=<%= swaps[i]._id %>" class="button__bubble button__bubble--small">Offer</a></td>
-                            </tr>
-                        <% } %>
-                    </table>
+                            </table>
+                    </div> 
                 </div>
             </div>
         <% } %>

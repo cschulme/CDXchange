@@ -22,7 +22,7 @@
             <section class="content__shell">
                 <div class="content__wrapper">
                     <h2 class="section--header">Your CDs for Swap</h2>
-                    <% if(typeof items !== 'undefined') { %>
+                    <% if(typeof items !== 'undefined' && items.length > 0) { %>
                         <table>
                             <tr>
                                 <th>Album</th>
@@ -56,10 +56,10 @@
                             <% }); %>
                         </table>
                         <br>
-                        <a href="#" class="button__bubble button__bubble--medium">Add another CD</a>
+                        <button class="button__bubble button__bubble--medium modal__select--trigger">Add another CD</a>
                     <% } else if (theUser.user == true) { %>
                         <h3>There's no CDs to show!  Time to start adding some CDs to your account!</h3>
-                        <a href="#" class="button__bubble button__bubble--medium">Add a CD</a>
+                        <a href="#" class="button__bubble button__bubble--medium modal__select--trigger">Add a CD</a>
                     <% } else { %>
                         <h3>There's no CDs to show!  Please log in.</h3>
                     <% } %>
@@ -68,5 +68,35 @@
         </main>
         
         <%- include partials/footer.ejs %>
+
+        <% if(theUser.user == true) { %>
+            <div class="modal modal__select">
+                <div class="modal--content modal__select--content">
+                    <div class="modal__select--header">
+                        <span class="modal--close">&times;</span>
+                        <h2>Add an Item:</h2>
+                    </div>
+                    <div class="modal__select--table-container">
+                        <table class="item-select__table">
+                            <tr>
+                                <th colspan="2">Album</th>
+                                <th>Artist</th>
+                                <th>Category</th>
+                                <th style="text-align: center"><i class="fas fa-plus"></i></th>
+                            </tr>
+                            <% allItems.forEach((item) => { %>
+                                <tr>
+                                    <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                    <td><%= item.artist %></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                    <td style="text-align: center"><a href='/addItem?item=<%= item._id %>' class="button__bubble button__bubble--small">Add</a></td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <% } %>
     </body>
 </html>

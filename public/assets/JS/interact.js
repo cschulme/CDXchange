@@ -23,8 +23,8 @@ $(document).ready(function() {
         $('.modal__sign-in').addClass("modal--show");
     });
 
-    $('.modal__swaps--trigger').click(function() {
-        $('.modal__swaps').addClass("modal--show");
+    $('.modal__select--trigger').click(function() {
+        $('.modal__select').addClass("modal--show");
     });
 
     $('.modal--close').click(function() {
@@ -39,5 +39,11 @@ $(document).ready(function() {
        } else {
          $('.modal').removeClass("modal--show");
        }
+    });
+
+    $('.form__radio-button').click(function() {
+        $("#form--submit").prop('disabled', false)
+            .removeClass('button__bubble--inactive')
+            .addClass('button__bubble');
     });
 });

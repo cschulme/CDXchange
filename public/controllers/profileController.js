@@ -1,10 +1,13 @@
 // --- MODULES ---
 const express = require('express');
 const app = module.exports = express();
+var bodyParser = require('body-parser');
 const ItemModel = require('../models/item');
 const UserModel = require('../models/user');
 const UserProfileModel = require('../models/userProfile');
 const SwapModel = require('../models/swap');
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // --- ROUTES ---
 // Sign in.
@@ -72,8 +75,7 @@ app.get('/myitems', function(req, res) {
                             getSwapsQuery(req.session.theUser._id, (err, doc) => {
                                 if(!err) {
                                     req.session.currentSwaps = doc;
-                                    var items = req.session.currentProfile.userItems;
-                                    res.render('myItems', { title: "CDXchange | My CDs", items: items });
+                                    res.redirect('/myitems');
                                 } else {
                                     res.redirect('/myItems');
                                 }
@@ -91,11 +93,24 @@ app.get('/myitems', function(req, res) {
     } else {
         if(req.session.currentProfile) {
             var items = req.session.currentProfile.userItems;
+
+            var itemIds = new Array();
+
+            items.forEach((item) => {
+                itemIds.push(item._id);
+            });
+
+            ItemModel.find( { _id: { $nin: itemIds } } ).sort( { catalogCategory: 1 } )
+                .then((allItems) => {
+                    res.render('myItems', { title: "CDXchange | My CDs", items: items, allItems: allItems });
+                }, (err) => {
+                    res.redirect('/404');
+                });
         } else {
             var items = undefined;
-        }
 
-        res.render('myItems', { title: "CDXchange | My CDs", items: items });
+            res.render('myItems', { title: "CDXchange | My CDs", items: items, allItems: undefined });
+        }
     }
 });
 
@@ -119,7 +134,71 @@ app.get('/myswaps', (req, res) => {
                     }
                 );
         } else if (req.query.action == 'withdraw') {
+            SwapModel.findOne( { _id: req.query.theSwap } )
+                // Save necessary info and delete the pending swap.
+                .then((swap) => {
+                    var results = new Array();
+                    results.push(swap.item);
+                    results.push(swap._swapUserId);
+                    results.push(swap.swapItem);
 
+                    return SwapModel.deleteOne( { _id: req.query.theSwap } ).exec()
+                        .then(() => {
+                            return results;
+                        })
+                })
+                // Recreate other user's available swap.
+                .then((results) => {
+                    var swapHolder = new SwapModel({
+                        _id: results[1] + '-' + results[2]._id,
+                        _userId: results[1],
+                        item: results[2],
+                        userRating: results[2].rating,
+                        status: 'Available',
+                        _swapUserId: undefined,
+                        swapItem: undefined,
+                        swapItemRating: undefined,
+                        swapUserRating: undefined
+                    });
+
+                    return swapHolder.save()
+                        .then(() => {
+                            return results;
+                        })
+                })
+                // Recreate the active user's available swap.
+                .then((results) => {
+                    var swapHolder = new SwapModel({
+                        _id: req.session.theUser._id + '-' + results[0]._id,
+                        _userId: req.session.theUser._id,
+                        item: results[0],
+                        userRating: results[0].rating,
+                        status: 'Available',
+                        _swapUserId: undefined,
+                        swapItem: undefined,
+                        swapItemRating: undefined,
+                        swapUserRating: undefined
+                    });
+
+                    return swapHolder.save()
+                        .then(() => {
+                            return;
+                        })
+                })
+                .then(() => {
+                    getSwapsQuery(req.session.theUser._id, (error, doc) => {
+                        if(!error) {
+                            req.session.currentSwaps = doc;
+                        }
+    
+                        res.redirect('/myswaps');
+                    })
+                })
+                // Handle any errors.
+                .then(undefined, (err) => {
+                    console.error(err);
+                    res.redirect('/404');
+                });  
         } else {
             res.redirect('/mySwaps');
         }
@@ -154,8 +233,49 @@ app.get('/myswaps', (req, res) => {
     }
 });
 
-app.post('/createSwap', (req, res) => {
+app.post('/createSwap', urlencodedParser, (req, res) => {
+    if(req.body.swap != undefined && req.body.swappedAlbum != undefined) {
+        // swapId represents the other user's item SwapModel _id.
+        var swapId = req.body.swap;
+        // itemId represents the user's item's SwapModel _id.
+        var itemId = req.body.swappedAlbum;
 
+        SwapModel.findOne( { _id: swapId} ).exec()
+            .then((swap) => {
+                return SwapModel.deleteOne( { _id: swapId } ).exec()
+                    .then(() => {
+                        return swap;
+                    });
+            })
+            .then((swap) => {
+                return SwapModel.findByIdAndUpdate(itemId, {
+                    status: 'Pending',
+                    _swapUserId: swap._userId,
+                    swapItem: swap.item,
+                    swapItemRating: swap.item.rating,
+                    swapUserRating: undefined
+                }).exec()
+                    .then(() => {
+                        return;
+                    });
+            })
+            .then(() => {
+                getSwapsQuery(req.session.theUser._id, (error, doc) => {
+                    if(!error) {
+                        req.session.currentSwaps = doc;
+                    }
+
+                    res.redirect('/myswaps');
+                })
+            })
+            // Handle any errors.
+            .then(undefined, (err) => {
+                console.error(err);
+                res.redirect('/404');
+            });  
+    } else {
+        res.redirect('/myswaps');
+    }
 });
 
 // --- FUNCTIONS ---

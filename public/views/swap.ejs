@@ -50,7 +50,7 @@
                     <h2 class="section--header">...for one of yours:</h2>
                     <br>
                     <% if(typeof swappableItems !== 'undefined' && swappableItems.length > 0) { %>
-                        <form action='/createSwap' method="POST">
+                        <form id="swapSelectForm" action='/createSwap' method="POST">
                             <table>
                                 <tr>
                                     <th>Select</th>
@@ -84,7 +84,7 @@
                                 <input type="hidden" name="swap" value="<%= swap._id %>">
                             </table>
                             <br>
-                            <input type="submit" value="Confirm Swap" class="button__bubble button__bubble--large right">
+                            <input type="submit" value="Confirm Swap" class="button__bubble--inactive button__bubble--large right" id="form--submit" disabled>
                             <br>
                             <br>
                         </form>
