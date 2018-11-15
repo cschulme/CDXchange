@@ -143,7 +143,7 @@ app.get('/myswaps', (req, res) => {
                         res.redirect('/myitems');
                     }
                 );
-        } else if (req.query.action == 'withdraw') {
+        } else if(req.query.action == 'withdraw') {
             SwapModel.findOne( { _id: req.query.theSwap } )
                 // Save necessary info and delete the pending swap.
                 .then((swap) => {
@@ -209,6 +209,130 @@ app.get('/myswaps', (req, res) => {
                     console.error(err);
                     res.redirect('/404');
                 });  
+        } else if(req.query.action == 'accept') {
+            SwapModel.findByIdAndUpdate(req.query.theSwap, {
+                status: 'Swapped'
+            }).exec()
+                .then((swap) => {
+                    let results = [];
+                    results.push(swap);
+
+                    return UserProfileModel.findOne({ _userId: swap._userId }).exec()
+                        .then((userProfile) => {
+                            results.push(userProfile);
+                            return results;
+                        })
+                })
+                .then((results) => {
+                    let itemsHolder = new Array();
+
+                    results[1].userItems.forEach((item) => {
+                        if(item._id != results[0].item._id) {
+                            itemsHolder.push(item);
+                        }
+                    });
+
+                    itemsHolder.push(results[0].swapItem);
+
+                    return UserProfileModel.findByIdAndUpdate(results[1]._id, {
+                        userItems: itemsHolder
+                    }).exec()
+                        .then(() => {
+                            return results;
+                        })
+                })
+                .then((results) => {
+                    return UserProfileModel.findOne({ _userId: results[0]._swapUserId }).exec()
+                        .then((userProfile) => {
+                            results.push(userProfile);
+                            return results;
+                        })
+                })
+                .then((results) => {
+                    let itemsHolder = new Array();
+
+                    results[2].userItems.forEach((item) => {
+                        if(item._id != results[0].swapItem._id) {
+                            itemsHolder.push(item);
+                        }
+                    });
+
+                    itemsHolder.push(results[0].item);
+
+                    return UserProfileModel.findByIdAndUpdate(results[2]._id, {
+                        userItems: itemsHolder
+                    }).exec()
+                        .then((userProfile) => {
+                            return userProfile._id;
+                        })
+                })
+                .then((id) => {
+                    return UserProfileModel.findById(id).exec()
+                        .then((userProfile) => {
+                            req.session.currentProfile = userProfile;
+                            res.redirect('/myswaps');
+                        })
+                })
+                // Handle any errors.
+                .then(undefined, (err) => {
+                    console.error(err);
+                    res.redirect('/404');
+                }); 
+        } else if(req.query.action == 'reject') {
+            SwapModel.findOne({ _id: req.query.theSwap }).exec()
+                .then((swap) => {
+                    let results = [
+                        swap._userId,
+                        swap.item,
+                        swap._swapUserId,
+                        swap.swapItem
+                    ];
+
+                    return SwapModel.deleteOne({ _id: swap._id }).exec()
+                        .then(() => {
+                            return results;
+                        })
+                })
+                .then((results) => {
+                    var swapHolder = new SwapModel({
+                        _id: results[0] + '-' + results[1]._id,
+                        _userId: results[0],
+                        item: results[1],
+                        userRating: results[1].rating,
+                        status: 'Available'
+                    });
+
+                    return swapHolder.save()
+                        .then(() => {
+                            return results;
+                        })
+                })
+                .then((results) => {
+                    var swapHolder = new SwapModel({
+                        _id: results[2] + '-' + results[3]._id,
+                        _userId: results[2],
+                        item: results[3],
+                        userRating: results[3].rating,
+                        status: 'Available'
+                    });
+
+                    return swapHolder.save()
+                        .then(() => {
+                            return;
+                        })
+                })
+                .then(() => {
+                    return SwapModel.find({ _userId: req.session.theUser._id }).exec()
+                        .then((swaps) => {
+                            req.session.currentSwaps = swaps;
+                            res.redirect('/myswaps');
+                        })
+                })
+                // Handle any errors.
+                .then(undefined, (err) => {
+                    console.error(err);
+                    res.redirect('/404');
+                }); 
         } else {
             res.redirect('/mySwaps');
         }
