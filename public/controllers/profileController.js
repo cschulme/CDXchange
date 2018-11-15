@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 const ItemModel = require('../models/item');
 const UserModel = require('../models/user');
 const UserProfileModel = require('../models/userProfile');
-const SwapModel = require('../models/swap');
+const OfferModel = require('../models/Offer');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 

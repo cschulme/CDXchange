@@ -20,6 +20,12 @@
             <section class="content content--centered static">
                 <div class="content__wrapper">
                     <h2>404 - Page not found. :(</h2>
+
+                    <% if(message) { %>
+                        <p><%= message %></p>
+                    <% } else { %>
+                        <p>Seems something went wrong...</p>
+                    <% } %>
                 </div>
             </section>
         </main>
