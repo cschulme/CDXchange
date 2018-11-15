@@ -46,7 +46,7 @@ app.get('/categories/:category/:item', function (req, res) {
                 }
             }
 
-            SwapModel.find( { 'item._id': req.params.item }, (err, swaps) => {
+            SwapModel.find( { 'item._id': req.params.item, status: 'Available' }, (err, swaps) => {
                 if(!err) {
                     var userIds = new Array();                    
                     

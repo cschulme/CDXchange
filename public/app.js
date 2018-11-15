@@ -25,7 +25,7 @@ app.use(function(req, res, next) {
     if(typeof req.session.theUser !== 'undefined') {
         var fullName = req.session.theUser.firstName + " " + req.session.theUser.lastName;
 
-        res.locals.theUser = { name: fullName, user: true };
+        res.locals.theUser = { name: fullName, user: true, id: req.session.theUser._id };
     } else {
         res.locals.theUser = { user: false };
     }

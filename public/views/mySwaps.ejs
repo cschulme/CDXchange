@@ -45,7 +45,11 @@
                                     <tr>
                                         <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
                                         <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
-                                        <td>---</td>
+                                        <% for(var j = 0; j < pendingSwapUsers.length; j++) { %>
+                                            <% if(pendingSwapUsers[j]._id == swap._swapUserId) { %>
+                                                <td><%= pendingSwapUsers[j].fullName %></td>
+                                            <% } %>
+                                        <% } %>
                                         <td>Pending</td>
                                         <td><a href="/mySwaps?action=withdraw&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
@@ -65,6 +69,22 @@
                                             <% } %>
                                             <td>Available</td>
                                             <td><a href="/mySwaps?action=offer&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                                        </tr>
+                                    <% } %>
+                                    <% if(swap.status == 'Pending' && swap._swapUserId == theUser.id) { %>
+                                        <tr>
+                                            <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
+                                            <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
+                                            <% for(var j = 0; j < swapUsers.length; j++) { %>
+                                                <% if(swapUsers[j]._id == swap._userId) { %>
+                                                    <td><%= swapUsers[j].fullName %></td>
+                                                <% } %>
+                                            <% } %>
+                                            <td>Pending</td>
+                                            <td>
+                                                <a href="/mySwaps?action=accept&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Accept</a>
+                                                <a href="/mySwaps?action=reject&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Reject</a>
+                                            </td>
                                         </tr>
                                     <% } %>
                                 <% }); %>
