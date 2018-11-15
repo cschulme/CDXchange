@@ -53,6 +53,18 @@
                                         <td>Pending</td>
                                         <td><a href="/mySwaps?action=withdraw&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
+                                <% } else if(swap.status == 'Swapped') { %>
+                                    <tr>
+                                        <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
+                                        <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
+                                        <% for(var j = 0; j < pendingSwapUsers.length; j++) { %>
+                                            <% if(pendingSwapUsers[j]._id == swap._swapUserId) { %>
+                                                <td><%= pendingSwapUsers[j].fullName %></td>
+                                            <% } %>
+                                        <% } %>
+                                        <td>Swapped</td>
+                                        <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
+                                    </tr>
                                 <% } %>
                             <% }); %>
                             
