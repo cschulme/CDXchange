@@ -27,10 +27,6 @@ const ItemSchema = new mongoose.Schema({
     }
 });
 
-ItemSchema.virtual('imageURL').get(() => {
-    return '/Images/AlbumCovers/' + this._id + '.jpg';
-});
-
 const Item = db.model('Item', ItemSchema);
 
 // --- MODULE EXPORTS ---
@@ -66,12 +62,25 @@ module.exports.getItemsByCategory = function(category) {
 
 /**
  * getItemsByArtist(artist) - Returns an array of all CDs by the passed artist.
- * @param artist - The artist to filter by.
+ * @param {String} artist - The artist to filter by.
  * @returns {Promise<any>}
  */
 module.exports.getItemsByArtist = function(artist) {
     return new Promise((resolve, reject) => {
         Item.find({ artist: artist })
+            .then(docs => resolve(docs))
+            .catch(err => reject(err))
+    })
+}
+
+/**
+ * getItems(arrayOfItemIds) - Returns all of the items in an array of item ids.
+ * @param {Array<String>} arrayOfItemIds - An array of item ids.
+ * @returns {Promise<any>}
+ */
+module.exports.getItems = function(arrayOfItemIds) {
+    return new Promise((resolve, reject) => {
+        Item.find({ _id: { $in: arrayOfItemIsd } })
             .then(docs => resolve(docs))
             .catch(err => reject(err))
     })

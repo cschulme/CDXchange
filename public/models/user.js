@@ -9,13 +9,15 @@ const UserSchema = new mongoose.Schema({
     firstName: String,
     lastName: String,
     email: String,
-    address1: String,
-    address2: String,
-    city: String,
-    // State, province, region, etc.
-    area: String,
-    postalCode: Number,
-    country: String,
+    address: {
+        address1: String,
+        address2: String,
+        city: String,
+        // State, province, region, etc.
+        area: String,
+        postalCode: Number,
+        country: String
+    },
     username: String,
     password: String,
     userItems: Array
@@ -46,7 +48,7 @@ module.exports.Users = User;
  * @param {Number} id - The _id value to search by.
  * @returns {Promise<any>}
  */
-module.exports.getUserById(id) = function(id) {
+module.exports.getUserById = function(id) {
     return new Promise((resolve, reject) => {
         User.findOne({ _id: id })
             .then(doc => resolve(doc))
@@ -135,49 +137,6 @@ module.exports.getUserItemsByUsername = function(username) {
 }
 
 /**
- * getArrayOfItemIds(id) - Returns an array of all the item ids in userItems for a user matching the passed id.
- * @param {Number} id - The user's _id.
- * @returns {Promise<any>}
- */
-module.exports.getArrayOfItemIds = function(id) {
-    return new Promise((resolve, reject) => {
-        User.findOne({ _id: id })
-            .then(doc => {
-                let arrayOfIds = new Array();
-
-                doc.userItems.forEach(item => arrayOfIds.push(item._id));
-
-                resolve(arrayOfIds);
-            })
-            .catch(err => reject(err))
-    })
-}
-
-/**
- * isItemOwned(id, itemId) - Returns true or false depending on whether the passed item id is in userItems.
- * @param {Number} id - The _id of the user in question.
- * @param {String} itemId - The item to be searched for.
- * @returns {Promise<any>}
- */
-module.exports.isItemOwned = function(id, itemId) {
-    return new Promise((resolve, reject) => {
-        User.findOne({ _id: id })
-            .then(user => {
-                var owned = false;
-
-                user.userItems.forEach((item) => {
-                    if(item._id == itemId) {
-                        owned = true;
-                    }
-                })
-
-                resolve(owned);
-            })
-            .catch(err => reject(err))
-    })
-}
-
-/**
  * addUser(firstName, lastName, email, address1, address2, city, area, postalCode, country, username, password, userItems) -
  *      Creates a user document and adds it to the users collection.
  * @param {String} firstName - The user's first name.
@@ -200,12 +159,14 @@ module.exports.addUser = function(firstName, lastName, email, address1, address2
             firstName: firstName,
             lastName: lastName,
             email: email,
-            address1: address1,
-            address2: address2,
-            city: city,
-            area: area,
-            postalCode: postalCode,
-            country: country,
+            address: {
+                address1: address1,
+                address2: address2,
+                city: city,
+                area: area,
+                postalCode: postalCode,
+                country: country,
+            },
             username: username,
             password: password,
             userItems: userItems
@@ -477,5 +438,23 @@ module.exports.changePasswordById = function(id, newPassword) {
 module.exports.changePasswordByUsername = function(username, newPassword) {
     User.findOneAndUpdate({ username: username }, { password: newPassword}, { new: true })
         .then(doc => resolve(doc))
+        .catch(err => reject(err))
+}
+
+/**
+ * login(username, password) - Returns the user profile is the currect password is passed.
+ * @param {String} username - The passed username.
+ * @param {String} password - The passed password.
+ * @returns {Promise<any>}
+ */
+module.exports.login = function(username, password) {
+    User.findOne({ username: username })
+        .then(user => {
+            if(password == user.password) {
+                resolve(user);
+            } else {
+                reject("Wrong password given.");
+            }
+        })
         .catch(err => reject(err))
 }

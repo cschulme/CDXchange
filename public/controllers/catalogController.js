@@ -15,8 +15,7 @@ app.get('/categories/:category', (req, res) => {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
     if(utilityFunctions.validateCategory(category) && req.session.currentProfile) {
-        UserModel.getArrayOfItemIds(req.session.theUser._id)
-            .then(arrayOfIds => ItemModel.getItemsNotOwned(arrayOfIds, category))
+        ItemModel.getItemsNotOwned(req.session.theUser.userItems)
             .then(itemsNotOwned => res.render('category', { title: "CDXchange | " + category, category: category, items: itemsNotOwned}))
             .catch(err => {
                 console.error(err);
@@ -39,18 +38,23 @@ app.get('/categories/:category/:item', (req, res) => {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
     if(utilityFunctions.validateCategory(category) && req.session.currentProfile) {
-        ItemModel.findById(req.params.item)
+        ItemModel.getItem(req.params.item)
             .then(item => {
                 let results = new Array();
                 results.push(item);
                 return results
             })
             .then(results => {
-                return UserModel.isItemOwned(req.session.theUser._id, req.params.item)
-                    .then(owned => {
-                        results.push(owned);
-                        return results;
-                    })
+                let owned = false;
+
+                req.session.theUser.userItems.forEach(item => {
+                    if(item == req.params.item) {
+                        owned = true;
+                    }
+                })
+
+                results.push(owned);
+                return results;
             })
             .then(results => {
                 return OfferModel.getAvailableOffersForItem(req.session.theUser._id, req.params.item)
@@ -64,7 +68,7 @@ app.get('/categories/:category/:item', (req, res) => {
                 results[2].forEach(offer => userIds.push(offer));
 
                 return UserModel.getUsersInSetOfIds(userIds)
-                    .then((docs) => {
+                    .then(docs => {
                         results.push(docs);
                         return results;
                     })
@@ -75,8 +79,12 @@ app.get('/categories/:category/:item', (req, res) => {
                 res.redirect('/404');
             })
     } else if(utilityFunctions.validateCategory(category)) {
-        ItemModel.findById(req.params.item)
-            .then(doc => res.render('item', { title: "CDXchange | " + item.itemName, item: doc, owned: false, swaps: undefined, swapUsers: undefined }))
+        ItemModel.getItem(req.params.item)
+            .then(item => res.render('item', { title: "CDXchange | " + item.itemName, item: item, owned: false, swaps: undefined, swapUsers: undefined }))
+            .catch(err => {
+                console.error(err);
+                res.redirect('/404');
+            })
     } else {
         res.status(404).render('404', {title: "CDXchange | 404: Page Not Found"});
     }

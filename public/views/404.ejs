@@ -21,7 +21,7 @@
                 <div class="content__wrapper">
                     <h2>404 - Page not found. :(</h2>
 
-                    <% if(message) { %>
+                    <% if(typeof message !== 'undefined') { %>
                         <p><%= message %></p>
                     <% } else { %>
                         <p>Seems something went wrong...</p>

@@ -66,6 +66,17 @@ module.exports.getOffersByUserId = function(userId) {
 }
 
 /**
+ * getOfferByUserIdAndOwnedItem(userId, item) - Finds the
+ */
+module.exports.getOfferByUserIdAndOwnedItem = function(userId, item) {
+    return new Promise((resolve, reject) => {
+        Offer.findOne({ _userId: userId, _ownedItemId: item })
+            .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    })
+}
+
+/**
  * getAvailableOffersForItem(userId, itemId) - Returns all available offers for a given album.
  * @param {Number} userId - The active user's _userId, for filtering.
  * @param {String} itemId - The item in question.
@@ -85,6 +96,7 @@ module.exports.getAvailableOffersForItem = function(userId, itemId) {
  * @param {String} ownedItemId - A code pointing to the item that the user owns.
  * @param {String} wantedItemId - A code pointing to the item taht the user
  *      wants in exchange for their item.
+ * @param {Number} otherUserId - The id of the other user who's matched the offer, if they exist.
  * @param {String} status - Available/Pending/Swapped
  * @returns {Promise<any>}
  */

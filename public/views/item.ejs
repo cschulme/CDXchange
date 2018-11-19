@@ -24,7 +24,7 @@
             <section id="album-content">
                 <div class="content__wrapper album-content__wrapper">
                     <div class="album-content__info">
-                        <img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="album-content__info--image">
+                        <img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="album-content__info--image">
                         <div class="album-content__info--data">
                             <div class="album-content__info--data-header">
                                 <h2><%= item.itemName %></h2>
@@ -96,7 +96,7 @@
         <%- include partials/footer.ejs %>
 
         <!-- SWAPS MODAL -->
-        <% if(swaps.length > 0) { %>
+        <% if(swaps && swaps.length > 0) { %>
             <div class="modal modal__select">
                 <div class="modal--content modal__select--content">
                     <div class="modal__select--header">

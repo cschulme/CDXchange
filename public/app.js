@@ -3,22 +3,29 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const helmet = require('helmet');
 const db = require('./db');
 const dbPrepopulate = require('./dbPrepopulate');
 const staticController = require('./controllers/staticController');
 const profileController = require('./controllers/profileController');
 const catalogController = require('./controllers/catalogController');
 
-
 // Create app object.
 const app = express();
 
 // --- CONFIGURE ---
 app.use(cookieParser());
-app.use(session({ secret: "Secret Code" }));
+app.use(session({
+    secret: "Secret Code",
+    cookie: {
+        secure: true,
+        httpOnly: true
+    }
+}));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'assets')));
+app.use(helmet())
 
 // --- MIDDLEWARE ---
 app.use(function(req, res, next) {

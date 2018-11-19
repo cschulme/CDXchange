@@ -2,147 +2,83 @@
 const express = require('express');
 const app = module.exports = express();
 var bodyParser = require('body-parser');
-const ItemModel = require('../models/item');
-const UserModel = require('../models/user');
-const UserProfileModel = require('../models/userProfile');
+const ItemModel = require('../models/Item');
+const UserModel = require('../models/User');
 const OfferModel = require('../models/Offer');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // --- ROUTES ---
 // Sign in.
-app.get('/signin', function(req, res) {
+app.get('/signin', (req, res) => {
     if(!req.session.theUser) {
-        
-        getUserQuery((error, doc) => {
-            if(!error) {
-                req.session.theUser = doc;
-            }
-
-            getProfileQuery(req.session.theUser._id, (error, doc) => {
-                if(!error) {
-                    req.session.currentProfile = doc;
-                }
-
-                getSwapsQuery(req.session.theUser._id, (error, doc) => {
-                    if(!error) {
-                        req.session.currentSwaps = doc;
-                    }
-
-                    res.redirect('/myitems');
-                })
+        UserModel.getUserById(1)
+            .then(user => req.session.theUser = user)
+            .then(() => {
+                OfferModel.getOffersByUserId(req.session.theUser._id)
+                    .then(offers => {
+                        req.session.currentOffers = offers
+                        return;
+                    });
+            })
+            .then(() => res.redirect('/myitems'))
+            .catch(err => {
+                console.error(err);
+                let message = "Sign in failed.";
+                res.status(404).render('404', { title: "CDXchange | 404: Page Not Found", message: message });
             });
-        });
     } else {
         res.redirect('/myitems');
     }
 });
 
+// Log in.
+app.post('/signin', urlencodedParser, (req, res) => {
+    if(req.body.username != undefined && req.body.password != undefined) {
+        UserModel.login(req.body.username, req.body.password)
+            .then(user => req.session.theUser = user)
+            .then(() => {
+                return OfferModel.getOffersByUserId(req.session.theUser._id)
+                    .then(offers => req.session.currentOffers = offers);
+            })
+            .catch(err => {
+                console.error(err);
+                let message = "Sign in failed.";
+                res.status(404).render('404', { title: "CDXchange | 404: Page Not Found", message: message });
+            })
+    }
+});
+
 // Sign out.
-app.get('/signout', function(req, res) {
+app.get('/signout', (req, res) => {
     if(req.session.theUser) {
         req.session.theUser = undefined;
-        req.session.currentProfile = undefined;
-        req.session.currentSwaps = undefined;
+        req.session.currentOffers = undefined;
     }
     res.redirect('/');
 })
 
 app.get('/myitems', function(req, res) {
-    if(req.session.currentProfile && req.query.action && req.query.theItem) {
+    if(req.session.theUser && req.query.action && req.query.theItem) {
         if(req.query.action == 'update') {
-            var swapId = req.session.theUser._id + '-' + req.query.theItem;
-            SwapModel.findOne( { _id: swapId } ).exec()
-                .then((swap) => {
-                    if(swap.status == 'Available' || swap.status == 'Swapped') {
-                        var path = swap.item.catalogCategory + '/' + swap.item._id;
-                        res.redirect('/categories/' + path);
-                    } else if(swap.status == 'Pending') {
-                        res.redirect('/myswaps');
-                    } else {
-                        res.redirect('/404');
-                    }
-                }, (err) => {
-                    console.error(err);
-                    res.redirect('/myitems');
-                });
+            updateItem(req, res, req.query.theItem);
         } else if(req.query.action == 'delete') {
-            deleteItemFromProfile(req.session.theUser._id, req.query.theItem, (err, profile) => {
-                if(!err) {
-                    req.session.currentProfile = profile;
-
-                    updateSwaps(req.session.theUser._id, req.query.theItem, (err) => {
-                        if(!err) {
-                            getSwapsQuery(req.session.theUser._id, (err, doc) => {
-                                if(!err) {
-                                    req.session.currentSwaps = doc;
-                                    res.redirect('/myitems');
-                                } else {
-                                    res.redirect('/myItems');
-                                }
-                            }) 
-                            
-                        } else {
-                            res.redirect('/myItems');
-                        }
-                    });
-                } else {
-                    res.redirect('/myItems');
-                }
-            });
-        }
-    } else {
-        if(req.session.currentProfile) {
-            var items = req.session.currentProfile.userItems;
-
-            var itemIds = new Array();
-
-            items.forEach((item) => {
-                itemIds.push(item._id);
-            });
-
-            ItemModel.find( { _id: { $nin: itemIds } } ).sort( { catalogCategory: 1 } )
-                .then((allItems) => {
-                    res.render('myItems', { title: "CDXchange | My CDs", items: items, allItems: allItems });
-                }, (err) => {
-                    res.redirect('/404');
-                });
+            deleteItem(req, res, req.query.theItem);
         } else {
-            var items = undefined;
-
-            res.render('myItems', { title: "CDXchange | My CDs", items: items, allItems: undefined });
+            res.redirect('/404');
         }
+    } else if(req.session.theUser) {
+        viewMyItems(req, res);
+    } else {
+        console.log(req.session);
+        res.render('myItems', { title: "CDXchange | My CDs", items: undefined, allItems: undefined });
     }
-});
+})
 
 app.get('/myswaps', (req, res) => {
     if(req.session.currentProfile && req.query.action && req.query.theSwap) {
         if(req.query.action == 'offer') {
-            SwapModel.findOne( { _id: req.query.theSwap } )
-                .then(
-                    (swap) => {
-                        var swappableItems = new Array();
-                        var owned = false;
-
-                        for(var i = 0; i < req.session.currentSwaps.length; i++) {
-                            if(req.session.currentSwaps[i].status == 'Available') {
-                                swappableItems.push(req.session.currentSwaps[i]);
-                            }
-                            if(req.session.currentSwaps[i].item._id == swap.item._id) {
-                                owned = true;
-                            }
-                        }
-
-                        if(owned == false) {
-                            res.render('swap', { title: "CDXchange | Swap " + swap.item.itemName, swap: swap, swappableItems: swappableItems });
-                        } else {
-                            res.redirect('/myitems');
-                        }
-                    }, (err) => {
-                        console.error(err);
-                        res.redirect('/myitems');
-                    }
-                );
+            
         } else if(req.query.action == 'withdraw') {
             SwapModel.findOne( { _id: req.query.theSwap } )
                 // Save necessary info and delete the pending swap.
@@ -512,102 +448,106 @@ app.post('/createSwap', urlencodedParser, (req, res) => {
 // --- FUNCTIONS ---
 // Validates that the item exists in the database.
 
-function getUserQuery(callback) {
-    UserModel.findOne( {}, function(err, doc) {
-        if(doc) {
-            callback(null, doc);
-        } else {
-            console.log("getUserQuery(): No user found.");
-            callback(true, null);
+/**
+ * updateItem(req, res, itemId) - Handles the update action of a user item.
+ * @param {Request} req  - The request object.
+ * @param {Response} res - The response object.
+ * @param {String} itemId - The id of the item to update.
+ */
+function updateItem(req, res, itemId) {
+    let owned = false;
+
+    req.session.theUser.userItems.forEach(item => {
+        if(item == itemId) {
+            owned = true;
         }
     });
-}
 
-function getProfileQuery(id, callback) {
-    UserProfileModel.findOne( { _userId: id }, function(err, doc) {
-        if(doc) {
-            callback(null, doc);
-        } else {
-            console.log("getProfileQuery(): No profile found.");
-            callback(true, null);
-        }
-    });
-}
+    if(owned == true) {
+        OfferModel.getOfferByUserIdAndOwnedItem(req.session.theUser._id, itemId)
+            .then(offer => {
+                let results = new Array();
+                results.push(offer);
+                
+                return ItemModel.getItem(itemId)
+                    .then(item => {
+                        results.push(item);
+                        return results;
+                    })
+            })
+            .then(results => {
+                offer = results[0];
+                item = results[1];
 
-function getSwapsQuery(id, callback) {
-    SwapModel.find( { _userId: id }, (err, doc) => {
-        if(doc) {
-            callback(null, doc);
-        } else {
-            console.log("getSwapsQuery(): No swaps founds.");
-            callback(true, null);
-        }
-    });
-}
-
-function deleteItemFromProfile(id, item, callback) {
-    UserProfileModel.findOne( { _userId: id }, (err, doc) => {
-
-        // If profile is found...
-        if(doc) {
-            var newUserItems = new Array();
-
-            for(var i = 0; i < doc.userItems.length; i++) {
-                if(doc.userItems[i]._id != item) {
-                    newUserItems.push(doc.userItems[i]);
+                if(offer == null || offer.status == 'Available' || offer.status == 'Swapped') {
+                    var path = item.catalogCategory + '/' + item._id;
+                    res.redirect('/categories/' + path);
+                } else if(offer.status == 'Pending') {
+                    res.redirect('/myswaps');
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                res.redirect('/404');
+            })
+    } else {
+        res.redirect('/404');
+    }
+}
+
+/**
+ * deleteItem(req, res, itemId) - Handles the delete action of a user item.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {String} itemId- The id of the item to delete.
+ */
+function deleteItem(req, res, itemId) {
+    UserModel.removeUserItemById(req.session.theUser._id, itemId)
+        .then(user => req.session.theUser = user)
+        .then(() => {
+            return OfferModel.getOfferByUserIdAndOwnedItem(req.session.theUser._id, itemId)
+        })
+        .then(offer => {
+            if(offer != null) {
+                OfferModel.deleteOffer(offer._id)
             }
-
-            // Update the profile.
-            UserProfileModel.updateOne( { _userId: id }, { userItems: newUserItems }, (err, raw) => {
-                        
-                UserProfileModel.findOne( { _userId: id }, (err, doc) => {
-                    if(doc) {
-                        callback(null, doc);
-                    } else {
-                        callback(true, null);
-                    }
-                });
-
-            });
-
-        } else {
+        })
+        .then(() => {
+            return OfferModel.getOffersByUserId(req.session.theUser._id)
+        })
+        .then(offers => {
+            req.session.currentOffers = offers;
+            res.redirect('/myitems');
+        })
+        .catch(err => {
             console.error(err);
-            callback(true, null);
-        }
-    });
+            res.redirect('/404');
+        })
 }
 
-function updateSwaps(id, item, callback) {
-    SwapModel.find( { _userId: id }, (err, doc) => {
-        if(doc) {
-            var swapsToBeRemoved = new Array();
+/**
+ * viewMyItems(req, res) - Function to handle viewing the user's dashboard.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ */
+function viewMyItems(req, res) {
+    let results = new Array();
 
-            for(var i = 0; i < doc.length; i++) {
-                if(doc[i].item._id == item) {
-                    swapsToBeRemoved.push(doc[i]._id);
-                }
-            }
+    ItemModel.getItems(req.session.theUser.userItems)
+        .then(items => {
+            results.push(items);
 
-            SwapModel.deleteMany( { _id: swapsToBeRemoved }, (err) => {
-                if(err) {
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            });
-        } else {
-            callback(true);
-        }
-    });
-}
-
-function getItem(item, callback) {
-    ItemModel.findOne( { _id: item }, (err, doc) => {
-        if(doc) {
-            callback(null, doc);
-        } else {
-            callback(true, null);
-        }
-    });
+            return ItemModel.getItemsNotOwned(req.session.theUser.userItems).exec()
+                .then(otherItems => {
+                    results.push(otherItems);
+                    return results;
+                })
+        })
+        .then(results => {
+            res.render('myItems', { title: "CDXchange | My CDs", items: results[0], allItems: results[1] })
+        })
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
 }

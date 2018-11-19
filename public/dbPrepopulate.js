@@ -1,35 +1,29 @@
 // --- MODULES ---
 const mongoose = require('mongoose');
 const db = require('./db');
-const ItemModel = require('./models/item');
-const UserModel = require('./models/user');
-const UserProfileModel = require('./models/userProfile');
-const SwapModel = require('./models/swap');
+const ItemModel = require('./models/Item');
+const UserModel = require('./models/User');
+const OfferModel = require('./models/Offer');
 
 /*
  * Resets and populates the database.
  */
 module.exports.resetDb = () => {
     // Clear items collection.
-    ItemModel.deleteMany({}).exec()
+    ItemModel.Items.deleteMany({}).exec()
         // Clear users collection.
         .then(() => {
             console.log("Item collection emptied.");
-            UserModel.deleteMany({}).exec();
-        })
-        // Clear userprofiles collection.
-        .then(() => {
-            console.log("User collection emptied.");
-            UserProfileModel.deleteMany({}).exec();
+            UserModel.Users.deleteMany({}).exec();
         })
         // Clear swaps collection.
         .then(() => {
-            console.log("UserProfile collection emptied.");
-            SwapModel.deleteMany({}).exec();
+            console.log("User collection emptied.");
+            OfferModel.Offers.deleteMany({}).exec();
         })
         // Status update.
         .then(() => {
-            console.log("Swap collection empited.");
+            console.log("Offer collection empited.");
             console.log("Beginning database population...");
         })
         // Populate items collection.
@@ -226,106 +220,103 @@ module.exports.resetDb = () => {
                 }
             ];
 
-            ItemModel.collection.insertMany(cds, (err, result) => {
+            ItemModel.Items.collection.insertMany(cds, (err, result) => {
                 console.log("Items collection populated.");
             })
         })
         // Populate users collection.
         .then(() => {
             let users = [
-                { _id: 1, firstName: 'Christian', lastName: 'Schulmeister', email: 'cschulme@uncc.edu', address1: '7429 Quail Wood Dr.', address2: 'Apt. F', city: 'Charlotte', area: 'NC', postalCode: 28226, country: 'USA' },
-                { _id: 2, firstName: 'Chase', lastName: 'Farinelli', email: 'chasesoufi@gmail.com', address1: '8213 Autumn Applause Dr.', address2: '', city: 'Charlotte', area: 'NC', postalCode: 28277, country: 'USA' },
-                { _id: 3, firstName: 'Katelyn', lastName: 'Schulmeister', email: 'keschulme@gmail.com', address1: '7429 Quail Wood Dr.', address2: 'Apt. F', city: 'Charlotte', area: 'NC', postalCode: 28226, country: 'USA' }
-            ];
-
-            UserModel.collection.insertMany(users, (err, result) => {
-                console.log("Users collection populated.");
-            });
-        })
-        // Populate userprofiles collection.
-        .then(() => {
-            let userprofiles = [
                 { 
                     _id: 1, 
-                    _userId: 1, 
+                    firstName: 'Christian', 
+                    lastName: 'Schulmeister', 
+                    email: 'cschulme@uncc.edu', 
+                    address: {
+                        address1: '7429 Quail Wood Dr.', 
+                        address2: 'Apt. F', 
+                        city: 'Charlotte', 
+                        area: 'NC', 
+                        postalCode: 28226, 
+                        country: 'USA'
+                    },
+                    username: 'cschulme',
+                    password: 'password',
                     userItems: [
-                        { _id: 'TaylorSwift-1989', itemName: '1989', artist: 'Taylor Swift', year: 2014, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: 'On 1989, Taylor Swift fully embraces her shift to synth pop, with stadium-ready anthems and harrowing ballads.', rating: 4 },
-                        { _id: 'TroyeSivan-Bloom', itemName: 'Bloom', artist: 'Troye Sivan', year: 2018, recordLabel: 'EMI Australia', catalogCategory: 'Pop', description: '', rating: 5 },
-                        { _id: 'WalkTheMoon-TalkingIsHard', itemName: 'Talking is Hard', artist: 'Walk the Moon', year: 2014, recordLabel: 'RCA Records', catalogCategory: 'Alternative', description: '', rating: 4 }
+                        'TaylorSwift-1989',
+                        'TroyeSivan-Bloom',
+                        'WalkTheMoon-TalkingIsHard'
                     ]
-                }, {
-                    _id: 2,
-                    _userId: 2,
+                }, { 
+                    _id: 2, 
+                    firstName: 'Chase', 
+                    lastName: 'Farinelli', 
+                    email: 'chasesoufi@gmail.com', 
+                    address: {
+                        address1: '8213 Autumn Applause Dr.', 
+                        address2: '', 
+                        city: 'Charlotte', 
+                        area: 'NC', 
+                        postalCode: 28277, 
+                        country: 'USA'
+                    },
+                    username: 'chasesoufi',
+                    password: 'hihihi',
                     userItems: [
-                        { _id: 'PinkFloyd-DarkSideOfTheMoon', itemName: 'Dark Side of the Moon', artist: 'Pink Floyd', year: 1973, recordLabel: 'Harvest', catalogCategory: 'Rock', description: '', rating: 5 },
-                        { _id: 'KendrickLamar-ToPimpAButterfly', itemName: 'To Pimp A Butterfly', artist: 'Kendrick Lamar', year: 2015, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '', rating: 5 },
-                        { _id: 'Nirvana-InUtero', itemName: 'In Utero', artist: 'Nirvana', year: 1993, recordLabel: 'DGC', catalogCategory: 'Alternative', description: '', rating: 4 }
+                        'PinkFloyd-DarkSideOfTheMoon',
+                        'KendrickLamar-ToPimpAButterfly',
+                        'Nirvana-InUtero'
                     ]
-                }, {
-                    _id: 3,
-                    _userId: 3,
+                }, { 
+                    _id: 3, 
+                    firstName: 'Katelyn', 
+                    lastName: 'Schulmeister', 
+                    email: 'keschulme@gmail.com', 
+                    address: {
+                        address1: '7429 Quail Wood Dr.', 
+                        address2: 'Apt. F', 
+                        city: 'Charlotte', 
+                        area: 'NC', 
+                        postalCode: 28226, 
+                        country: 'USA'
+                    },
+                    username: 'pinkpheonix',
+                    password: '12345',
                     userItems: [
-                        { _id: 'BlackSabbath-MasterOfReality', itemName: 'Master of Reality', artist: 'Black Sabbath', year: 1971, recordLabel: 'Vertigo Records', catalogCategory: 'Metal', description: '', rating: 3 },
-                        { _id: 'Eminem-Kamikaze', itemName: 'Kamikaze', artist: 'Eminem', year: 2018, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '', rating: 5 },
-                        { _id: 'Anthrax-FistfulOfMetal', itemName: 'Fistful of Metal', artist: 'Anthrax', year: 1984, recordLabel: 'Banzai Records', catalogCategory: 'Metal', description: '', rating: 4 }
+                        'BlackSabbath-MasterOfReality',
+                        'Eminem-Kamikaze',
+                        'Anthrax-FistfulOfMetal'
                     ]
                 }
             ];
 
-            UserProfileModel.collection.insertMany(userprofiles, (err, result) => {
-                console.log("UserProfiles collection populated.")
-            })
+            UserModel.Users.collection.insertMany(users, (err, result) => {
+                console.log("Users collection populated.");
+            });
         })
-        // Populate swaps collection.
+        // Populate offers collection.
         .then(() => {
-            return UserProfileModel.find({}).exec()
-                .then((profiles) => {
-                    return profiles;
-                })
-        })
-        .then((profiles) => {
-            var swaps = new Array();
+            let offers = [
+                {
+                    _id: 1,
+                    _userId: 2,
+                    _ownedItemId: 'KendrickLamar-ToPimpAButterfly',
+                    _wantedItemId: 'TaylorSwift-1989',
+                    _otherUserId: undefined,
+                    status: 'Available'
+                }, {
+                    _id: 2,
+                    _userId: 1,
+                    _ownedItemId: 'TroyeSivan-Bloom',
+                    _wantedItemId: 'Eminem-Kamikazee',
+                    _otherUserId: 3,
+                    status: 'Pending'
+                }
+            ];
 
-            profiles.forEach((profile) => {
-                profile.userItems.forEach((item) => {
-                    if(item.itemName != "Talking is Hard" && item.itemName != "Dark Side of the Moon") {
-                        swapHolder = {
-                            _id: profile._id + '-' + item._id,
-                            _userId: profile._id,
-                            item: item,
-                            userRating: item.rating,
-                            status: 'Available',
-                            _swapUserId: undefined,
-                            swapItem: undefined,
-                            swapItemRating: undefined,
-                            swapUserRating: undefined
-                        }
-    
-                        swaps.push(swapHolder);
-                    }
-                });
-            });
-
-            var offer = {
-                _id: '2-PinkFloyd-DarkSideOfTheMoon',
-                _userId: 2,
-                item: { _id: 'PinkFloyd-DarkSideOfTheMoon', itemName: 'Dark Side of the Moon', artist: 'Pink Floyd', year: 1973, recordLabel: 'Harvest', catalogCategory: 'Rock', description: '', rating: 5 },
-                userRating: 5,
-                status: 'Pending',
-                _swapUserId: 1,
-                swapItem: { _id: 'WalkTheMoon-TalkingIsHard', itemName: 'Talking is Hard', artist: 'Walk the Moon', year: 2014, recordLabel: 'RCA Records', catalogCategory: 'Alternative', description: '', rating: 4 },
-                swapItemRating: 4,
-                swapUserRating: 5
-            }
-
-            swaps.push(offer);
-
-            return swaps;
-        })
-        .then((swaps) => {
-            SwapModel.collection.insertMany(swaps, (err, result) => {
-                console.log("Swaps collection populated.");
-            });
+            OfferModel.Offers.collection.insertMany(offers, (err, result) => {
+                console.log("Offer collection populated.");
+            })
         })
         // Handle any errors.
         .then(undefined, (err) => {
@@ -338,24 +329,19 @@ module.exports.resetDb = () => {
  */
 module.exports.dropDb = () => {
     // Clear items collection.
-    ItemModel.deleteMany({})
+    ItemModel.Items.deleteMany({})
         // Clear users collection.
         .then(() => {
             console.log("Item collection emptied.");
-            UserModel.deleteMany({});
-        })
-        // Clear userprofiles collection.
-        .then(() => {
-            console.log("User collection emptied.");
-            UserProfileModel.deleteMany({});
+            UserModel.Users.deleteMany({});
         })
         // Clear swaps collection.
         .then(() => {
-            console.log("UserProfile collection emptied.");
-            SwapModel.deleteMany({});
+            console.log("User collection emptied.");
+            OfferModel.Offers.deleteMany({});
         })
         // Status update.
         .then(() => {
-            console.log("Swap collection empited.");
+            console.log("Offer collection empited.");
         })
 }
