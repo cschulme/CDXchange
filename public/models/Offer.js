@@ -66,6 +66,20 @@ module.exports.getOffersByUserId = function(userId) {
 }
 
 /**
+ * getOffersFromOtherUsers(userId) - Returns all offers made by other users to a specified user, as 
+ *      found by their user id.
+ * @param {Number} userId - The id representing the user we're filtering by.
+ * @returns {Promise<any>}
+ */
+module.exports.getOffersFromOtherUsers = function(userId) {
+    return new Promise((resolve, reject) => {
+        Offer.find({ _userId: { $ne: userId }})
+            .then(docs => resolve(docs))
+            .catch(err => reject(err))
+    })
+}
+
+/**
  * getOfferByUserIdAndOwnedItem(userId, item) - Finds the
  */
 module.exports.getOfferByUserIdAndOwnedItem = function(userId, item) {

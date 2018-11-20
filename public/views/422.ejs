@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+            </section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>422 - Errors encountered:</h2>
+
+                    <% if(typeof errors !== 'undefined') { %>
+                        <table>
+                            <tr>
+                                <th>Field</th>
+                                <th>Error Message</th>
+                            </tr>
+
+                            <% errors.forEach(error => { %>
+                                <tr>
+                                    <td><%= error.param %></td>
+                                    <td><%= error.msg %></td>
+                                </tr>
+                            <% }) %>
+                        </table>
+                    <% } else { %>
+                        <p>Seems something went wrong...</p>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

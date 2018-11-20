@@ -80,7 +80,7 @@ module.exports.getItemsByArtist = function(artist) {
  */
 module.exports.getItems = function(arrayOfItemIds) {
     return new Promise((resolve, reject) => {
-        Item.find({ _id: { $in: arrayOfItemIsd } })
+        Item.find({ _id: { $in: arrayOfItemIds } })
             .then(docs => resolve(docs))
             .catch(err => reject(err))
     })

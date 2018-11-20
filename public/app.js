@@ -17,10 +17,6 @@ const app = express();
 app.use(cookieParser());
 app.use(session({
     secret: "Secret Code",
-    cookie: {
-        secure: true,
-        httpOnly: true
-    }
 }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

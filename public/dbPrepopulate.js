@@ -308,7 +308,7 @@ module.exports.resetDb = () => {
                     _id: 2,
                     _userId: 1,
                     _ownedItemId: 'TroyeSivan-Bloom',
-                    _wantedItemId: 'Eminem-Kamikazee',
+                    _wantedItemId: 'Eminem-Kamikaze',
                     _otherUserId: 3,
                     status: 'Pending'
                 }

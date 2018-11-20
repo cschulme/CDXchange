@@ -22,90 +22,152 @@
             <section class="content__shell">
                 <div class="content__wrapper">
                     <h2 class="section--header">Your Swap Offers</h2>
-                    <% if(typeof mySwaps !== 'undefined') { %>
+                    <% if(typeof myOffers !== 'undefined') { %>
                         <table>
                             <tr>
-                                <th>Your Album</th>
-                                <th>Their Album</th>
-                                <th>User</th>
-                                <th>Status</th>
+                                <th>This user...</th>
+                                <th>...will trade...</th>
+                                <th>...for...</th>
+                                <th>...with...</th>
+                                <th>...Offer Status</th>
                                 <th></th>
                             </tr>
 
-                            <% mySwaps.forEach(function(swap) { %>
-                                <% if(swap.status == 'Available') { %>
+                            <% myOffers.forEach(function(offer) { %>
+                                <% if(offer.status == 'Available') { %>
                                     <tr>
-                                        <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
+                                        <td>You</td>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._ownedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                            <% } %>
+                                        <% }) %>
                                         <td>---</td>
                                         <td>---</td>
                                         <td>Available</td>
                                         <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
                                     </tr>
-                                <% } else if(swap.status == 'Pending') { %>
+                                <% } else if(offer.status == 'Pending') { %>
                                     <tr>
-                                        <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
-                                        <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
-                                        <% for(var j = 0; j < pendingSwapUsers.length; j++) { %>
-                                            <% if(pendingSwapUsers[j]._id == swap._swapUserId) { %>
-                                                <td><%= pendingSwapUsers[j].fullName %></td>
+                                        <td>You</td>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._ownedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
                                             <% } %>
-                                        <% } %>
+                                        <% }) %>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._wantedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                            <% } %>
+                                        <% }) %>
+                                        <% myUsers.forEach(user => { %>
+                                            <% if(user._id == offer._otherUserId) { %>
+                                                <td><%= user.username %></td>
+                                            <% } %>
+                                        <% }) %>
                                         <td>Pending</td>
-                                        <td><a href="/mySwaps?action=withdraw&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
+                                        <td><a href="/mySwaps?action=withdraw&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
-                                <% } else if(swap.status == 'Swapped') { %>
+                                <% } else if(offer.status == 'Swapped') { %>
                                     <tr>
-                                        <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
-                                        <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
-                                        <% for(var j = 0; j < pendingSwapUsers.length; j++) { %>
-                                            <% if(pendingSwapUsers[j]._id == swap._swapUserId) { %>
-                                                <td><%= pendingSwapUsers[j].fullName %></td>
+                                        <td>You</td>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._ownedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
                                             <% } %>
-                                        <% } %>
+                                        <% }) %>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._wantedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                            <% } %>
+                                        <% }) %>
+                                        <% myUsers.forEach(user => { %>
+                                            <% if(user._id == offer._otherUserId) { %>
+                                                <td><%= user.username %></td>
+                                            <% } %>
+                                        <% }) %>
                                         <td>Swapped</td>
                                         <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
                                     </tr>
                                 <% } %>
                             <% }); %>
                             
-                            <% if(typeof otherSwaps !== 'undefined') { %>
-                                <% otherSwaps.forEach(function(swap) { %>
-                                    <% if(swap.status == 'Available') { %>
+                            <% if(typeof otherOffers !== 'undefined') { %>
+                                <% otherOffers.forEach(function(offer) { %>
+                                    <% if(offer.status == 'Available') { %>
                                         <tr>
+                                            <% otherUsers.forEach(user => { %>
+                                                <% if(user._id == offer._userId) { %>
+                                                    <td><%= user.username %></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._ownedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._wantedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
                                             <td>---</td>
-                                            <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
-                                            <% for(var j = 0; j < swapUsers.length; j++) { %>
-                                                <% if(swapUsers[j]._id == swap._userId) { %>
-                                                    <td><%= swapUsers[j].fullName %></td>
-                                                <% } %>
-                                            <% } %>
                                             <td>Available</td>
-                                            <td><a href="/mySwaps?action=offer&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Offer</a></td>
-                                        </tr>
-                                    <% } else if(swap.status == 'Pending' && swap._swapUserId == theUser.id) { %>
-                                        <tr>
-                                            <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
-                                            <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
-                                            <% for(var j = 0; j < swapUsers.length; j++) { %>
-                                                <% if(swapUsers[j]._id == swap._userId) { %>
-                                                    <td><%= swapUsers[j].fullName %></td>
+                                            <% let ownWantedItem = false %>
+                                            <% for(let i = 0; i < myItems.length; i++) { %>
+                                                <% if(myItems[i] == offer._wantedItemId) { %>
+                                                    <% ownWantedItem = true; %>
+                                                    <% break; %>
                                                 <% } %>
                                             <% } %>
+                                            <% if(ownWantedItem == true) { %>
+                                                <td><a href="/mySwaps?action=offer&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                                            <% } else { %>
+                                                <td><span class="button__bubble--small button__bubble--inactive">Offer</span></td>
+                                            <% } %>
+                                        </tr>
+                                    <% } else if(offer.status == 'Pending' && offer._otherUserId == theUser.id) { %>
+                                        <tr>
+                                            <% otherUsers.forEach(user => { %>
+                                                <% if(user._id == offer._userId) { %>
+                                                    <td><%= user.username %></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._ownedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._wantedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <td>You</td>
                                             <td>Pending</td>
                                             <td>
-                                                <a href="/mySwaps?action=accept&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Accept</a>
-                                                <a href="/mySwaps?action=reject&theSwap=<%= swap._id %>" class="button__bubble button__bubble--small">Reject</a>
+                                                <a href="/mySwaps?action=accept&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Accept</a>
+                                                <a href="/mySwaps?action=reject&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Reject</a>
                                             </td>
                                         </tr>
-                                    <% } else if(swap.status == 'Swapped' && swap._swapUserId == theUser.id ) { %>
+                                    <% } else if(offer.status == 'Swapped' && offer._otherUserId == theUser.id ) { %>
                                         <tr>
-                                            <td><a href="/categories/<%= swap.swapItem.catalogCategory %>/<%= swap.swapItem._id %>" class="button__bar button__bar--small"><%= swap.swapItem.artist %> - <%= swap.swapItem.itemName %></a></td>
-                                            <td><a href="/categories/<%= swap.item.catalogCategory %>/<%= swap.item._id %>" class="button__bar button__bar--small"><%= swap.item.artist %> - <%= swap.item.itemName %></a></td>
-                                            <% for(var j = 0; j < swapUsers.length; j++) { %>
-                                                <% if(swapUsers[j]._id == swap._userId) { %>
-                                                    <td><%= swapUsers[j].fullName %></td>
+                                            <% otherUsers.forEach(user => { %>
+                                                <% if(user._id == offer._userId) { %>
+                                                    <td><%= user.username %></td>
                                                 <% } %>
-                                            <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._ownedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <% otherOffersItems.forEach(item => { %>
+                                                <% if(item._id == offer._wantedItemId) { %>
+                                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                                <% } %>
+                                            <% }) %>
+                                            <td>You</td>
                                             <td>Swapped</td>
                                             <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
                                         </tr>
@@ -119,6 +181,8 @@
                     <% } else { %>
                         <h3>There's no items to show!  Please log in.</h3>
                     <% } %>
+                    <br>
+                    <a href="#" class="button__bubble button__bubble--medium">Create a swap offer</a>
                 </div>
             </section>
         </main>

@@ -44,7 +44,7 @@
                             </p>
                             <% if(theUser.user == true) { %>
                                 <% if(owned == false) { %>
-                                    <% if(swaps.length > 0) { %>
+                                    <% if(swaps && swaps.length > 0) { %>
                                         <button class="button__bubble button__bubble--medium modal__select--trigger">Swap It (<%= swaps.length %> Available)</button>
                                     <% } else { %> 
                                         <span class="button__bubble--medium button__bubble--inactive">None available at this time</span>

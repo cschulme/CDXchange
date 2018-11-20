@@ -320,17 +320,15 @@ module.exports.removeUserItemById = function(id, item) {
     return new Promise((resolve, reject) => {
         User.findOne({ _id: id })
             .then(doc => {
-                // Find the index of the item to remove.
-                let index = doc.userItems.indexOf(item);
+                let userItemsCopy = new Array();
 
-                // Create a copy of the user's userItems array.
-                if(index > -1) {
-                    var userItemsCopy = doc.userItems.slice(index, 1);
-                } else {
-                    var userItemsCopy = doc.userItems.slice();
-                }
+                doc.userItems.forEach(userItem => {
+                    if(userItem != item) {
+                        userItemsCopy.push(userItem);
+                    }
+                })
                 
-                return(userItemsCopy)
+                return userItemsCopy;
             })
             .then(userItemsCopy => {
                 return User.findOneAndUpdate(
@@ -423,9 +421,11 @@ module.exports.removeUserItemByUsername = function(username, item) {
  * @returns {Promise<any>}
  */
 module.exports.changePasswordById = function(id, newPassword) {
-    User.findOneAndUpdate({ _id: id }, { password: newPassword}, { new: true })
-        .then(doc => resolve(doc))
-        .catch(err => reject(err))
+    return new Promise((resolve, reject) => {
+        User.findOneAndUpdate({ _id: id }, { password: newPassword}, { new: true })
+            .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    })
 }
 
 /**
@@ -436,25 +436,29 @@ module.exports.changePasswordById = function(id, newPassword) {
  * @returns {Promise<any>}
  */
 module.exports.changePasswordByUsername = function(username, newPassword) {
-    User.findOneAndUpdate({ username: username }, { password: newPassword}, { new: true })
-        .then(doc => resolve(doc))
-        .catch(err => reject(err))
+    return new Promise((resolve, reject) => {
+        User.findOneAndUpdate({ username: username }, { password: newPassword}, { new: true })
+            .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    })
 }
 
 /**
- * login(username, password) - Returns the user profile is the currect password is passed.
+ * login(username, password) - Returns the user profile if the correct password is passed.
  * @param {String} username - The passed username.
  * @param {String} password - The passed password.
  * @returns {Promise<any>}
  */
 module.exports.login = function(username, password) {
-    User.findOne({ username: username })
-        .then(user => {
-            if(password == user.password) {
-                resolve(user);
-            } else {
-                reject("Wrong password given.");
-            }
-        })
-        .catch(err => reject(err))
+    return new Promise((resolve, reject) => {
+        User.findOne({ username: username })
+            .then(user => {
+                if(password == user.password) {
+                    resolve(user);
+                } else {
+                    reject("Wrong password given.");
+                }
+            })
+            .catch(err => reject(err))
+    })
 }
