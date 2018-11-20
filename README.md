@@ -1,0 +1,1 @@
+The command 'npm run resetDb' will run a script that will reset the database for testing purposes.
