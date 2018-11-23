@@ -50,7 +50,7 @@
                                     </td>
                                     <td>
                                         <a href="/myItems?action=update&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Update</a>
-                                        <a href="/myItems?action=delete&theItem=<%= item._id %>" class="button__bubble button__bubble--small">Delete</a>
+                                        <button onclick="deleteItemPrompt('<%= item._id %>')" class="button__bubble button__bubble--small">Delete</button>
                                     </td>
                                 </tr>
                             <% }); %>
@@ -86,7 +86,7 @@
                             </tr>
                             <% allItems.forEach((item) => { %>
                                 <tr>
-                                    <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                    <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
                                     <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
                                     <td><%= item.artist %></td>
                                     <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
@@ -98,5 +98,13 @@
                 </div>
             </div>
         <% } %>
+
+        <script>
+            function deleteItemPrompt(itemId) {
+                if(confirm("Are you sure you want to delete this CD from your profile?")) {
+                    window.location = '/myItems?action=delete&theItem=' + itemId;
+                }
+            }
+        </script>
     </body>
 </html>

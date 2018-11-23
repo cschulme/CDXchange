@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+            </section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>403 - Access Denied</h2>
+
+                    <% if(typeof message !== 'undefined') { %>
+                        <p><%= message %></p>
+                    <% } else { %>
+                        <p>Looks like you're not supposed to be here!</p>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

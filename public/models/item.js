@@ -87,13 +87,26 @@ module.exports.getItems = function(arrayOfItemIds) {
 }
 
 /**
- * getItemsNotOwned(arrayOfItemIds, category) - Returns all of the items not in an array
+ * getItemsNotInArray(arrayOfItemIds) - Returns all of the items not in a given array of ids.
+ * @param {Array<String>} arrayOfItemIds - An array of item ids owned by the user.
+ * @returns {Promise<any>}
+ */
+module.exports.getItemsNotInArray = function(arrayOfItemIds) {
+    return new Promise((resolve, reject) => {
+        Item.find({ _id: { $nin: arrayOfItemIds } })
+            .then(docs => resolve(docs))
+            .catch(err => reject(err))
+    })
+}
+
+/**
+ * getItemsNotOwnedByCategory(arrayOfItemIds, category) - Returns all of the items not in an array
  *      of owned items per category.
  * @param arrayOfItemIds - An array of item ids owned by the user.
  * @param category - The category to look through.
  * @returns {Promise<any>}
  */
-module.exports.getItemsNotOwned = function(arrayOfItemIds, category) {
+module.exports.getItemsNotOwnedByCategory = function(arrayOfItemIds, category) {
     return new Promise((resolve, reject) => {
         Item.find( { _id: { $nin: arrayOfItemIds}, catalogCategory: category })
             .then(docs => resolve(docs))
@@ -137,8 +150,8 @@ module.exports.addItem = function(itemName, artist, year, recordLabel, catalogCa
 /**
  * updateItem(itemId, update) - Finds the item match the item id and updates it, returning
  *      the new document if no errors occur.
- * @param itemId - The _id value for the item to be found.
- * @param update - An object representing the update to be done.
+ * @param {String} itemId - The _id value for the item to be found.
+ * @param {Object} update - An object representing the update to be done.
  * @returns {Promise<any>}
  */
 module.exports.updateItem = function(itemId, update) {
@@ -152,13 +165,32 @@ module.exports.updateItem = function(itemId, update) {
 /**
  * deleteItem(itemId) - Deletes the item from the database.
  *      Returns the deleted item.
- * @param itemId - The _id value for the item to be deleted.
+ * @param {String} itemId - The _id value for the item to be deleted.
  * @returns {Promise<any>}
  */
 module.exports.deleteItem = function(itemId) {
     return new Promise((resolve, reject) => {
         Item.findOneAndDelete({ _id: itemId })
             .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    })
+}
+
+/**
+ * doesItemExist(itemId) - Returns true if item is a valid item in the database.
+ * @param {String} itemId - The _id value of the item to be checked for.
+ * @returns {Promise<any>}
+ */
+module.exports.doesItemExist = function(itemId) {
+    return new Promise((resolve, reject) => {
+        Item.findOne({ _id: itemId })
+            .then(doc => {
+                if(doc != null) {
+                    resolve(true);
+                } else {
+                    reject(false);
+                }
+            })
             .catch(err => reject(err))
     })
 }

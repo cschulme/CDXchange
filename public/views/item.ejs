@@ -112,14 +112,14 @@
                                 </tr>
                                 <% for(var i = 0; i < swaps.length; i++) { %>
                                     <tr>
-                                        <td><img src="<%= item.imageURL %>" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
-                                        <td><%= swaps[i].item.artist %> - <%= swaps[i].item.itemName %></td>   
+                                        <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                        <td><%= item.artist %> - <%= item.itemName %></td>   
                                         <% for(var j = 0; j < swapUsers.length; j++) { %>
                                             <% if(swapUsers[j]._id == swaps[i]._userId) { %>
-                                                <td><%= swapUsers[j].fullName %></td>
+                                                <td><%= swapUsers[j].username %></td>
                                             <% } %>
                                         <% } %>
-                                        <td style="text-align: center"><a href="/myswaps?action=offer&theSwap=<%= swaps[i]._id %>" class="button__bubble button__bubble--small">Offer</a></td>
+                                        <td style="text-align: center"><a href="/mySwaps?action=offer&theOffer=<%= swaps[i]._id %>" class="button__bubble button__bubble--small">Offer</a></td>
                                     </tr>
                                 <% } %>
                             </table>

@@ -3,6 +3,7 @@ const express = require('express');
 const app = module.exports = express();
 const { check, validationResult } = require('express-validator/check');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const ItemModel = require('../models/Item');
 const UserModel = require('../models/User');
 const OfferModel = require('../models/Offer');
@@ -11,27 +12,6 @@ const OfferModel = require('../models/Offer');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // --- ROUTES ---
-// Sign in.
-app.get('/signin*', (req, res) => {
-    if(!req.session.theUser) {
-        UserModel.getUserById(1)
-            .then(user => req.session.theUser = user)
-            .then(() => {
-                OfferModel.getOffersByUserId(req.session.theUser._id)
-                    .then(offers => {
-                        req.session.currentOffers = offers;
-                        res.redirect('/myitems')
-                    });
-            })
-            .catch(err => {
-                console.error(err);
-                let message = "Sign in failed.";
-                res.status(404).render('404', { title: "CDXchange | 404: Page Not Found", message: message });
-            });
-    } else {
-        res.redirect('/myitems');
-    }
-});
 
 // Log in.
 app.post('/signin', urlencodedParser, [
@@ -48,29 +28,28 @@ app.post('/signin', urlencodedParser, [
         return res.status(422).render('422', { title: "CDXchange | 422: Unprocessable Entity", errors: errors.array() });
     }
 
-    UserModel.login(req.body.username, req.body.password)
+    UserModel.getUserByUsername(req.body.username)
+        .then(user => hashedPassword = sha256(req.body.password, user.password.salt))
+        .then(hashedPassword => UserModel.login(req.body.username, hashedPassword.passwordHash))
         .then(user => req.session.theUser = user)
-        .then(() => {
-            OfferModel.getOffersByUserId(req.session.theUser._id)
-                .then(offers => {
-                    req.session.currentOffers = offers;
-                    res.redirect('/myitems')
-                });
-        })
+        .then(() => res.redirect('back'))
         .catch(err => {
             console.error(err);
             let message = "Sign in failed.";
             res.status(404).render('404', { title: "CDXchange | 404: Page Not Found", message: message });
-        })
+        });
 });
 
 // Sign out.
 app.get('/signout', (req, res) => {
     if(req.session.theUser) {
         req.session.theUser = undefined;
-        req.session.currentOffers = undefined;
     }
     res.redirect('/');
+})
+
+app.get('/register', (req, res) => {
+    res.render('register', { title: "CDXchange | My CDs" });
 })
 
 app.get('/myitems', function(req, res) {
@@ -85,7 +64,6 @@ app.get('/myitems', function(req, res) {
     } else if(req.session.theUser) {
         return viewMyItems(req, res);
     } else {
-        console.log(req.session);
         res.render('myItems', { title: "CDXchange | My CDs", items: undefined, allItems: undefined });
     }
 })
@@ -94,132 +72,14 @@ app.get('/myswaps', (req, res) => {
     if(req.session.theUser && req.query.action && req.query.theOffer) {
         if(req.query.action == 'offer') {
             return makeOfferToUser(req, res, req.query.theOffer);
-        } else if(req.query.action == 'withdraw') {
-            return withdrawOffer(req, res, req.query.theOffer);
+        } else if(req.query.action == 'withdrawOwnOffer') {
+            return withdrawOwnOffer(req, res, req.query.theOffer);
+        } else if(req.query.action == 'withdrawOtherOffer') {
+            return withdrawOtherOffer(req, res, req.query.theOffer);
         } else if(req.query.action == 'accept') {
-            SwapModel.findByIdAndUpdate(req.query.theSwap, {
-                status: 'Swapped'
-            }).exec()
-                .then((swap) => {
-                    let results = [];
-                    results.push(swap);
-
-                    return UserProfileModel.findOne({ _userId: swap._userId }).exec()
-                        .then((userProfile) => {
-                            results.push(userProfile);
-                            return results;
-                        })
-                })
-                .then((results) => {
-                    let itemsHolder = new Array();
-
-                    results[1].userItems.forEach((item) => {
-                        if(item._id != results[0].item._id) {
-                            itemsHolder.push(item);
-                        }
-                    });
-
-                    itemsHolder.push(results[0].swapItem);
-
-                    return UserProfileModel.findByIdAndUpdate(results[1]._id, {
-                        userItems: itemsHolder
-                    }).exec()
-                        .then(() => {
-                            return results;
-                        })
-                })
-                .then((results) => {
-                    return UserProfileModel.findOne({ _userId: results[0]._swapUserId }).exec()
-                        .then((userProfile) => {
-                            results.push(userProfile);
-                            return results;
-                        })
-                })
-                .then((results) => {
-                    let itemsHolder = new Array();
-
-                    results[2].userItems.forEach((item) => {
-                        if(item._id != results[0].swapItem._id) {
-                            itemsHolder.push(item);
-                        }
-                    });
-
-                    itemsHolder.push(results[0].item);
-
-                    return UserProfileModel.findByIdAndUpdate(results[2]._id, {
-                        userItems: itemsHolder
-                    }).exec()
-                        .then((userProfile) => {
-                            return userProfile._id;
-                        })
-                })
-                .then((id) => {
-                    return UserProfileModel.findById(id).exec()
-                        .then((userProfile) => {
-                            req.session.currentProfile = userProfile;
-                            res.redirect('/myswaps');
-                        })
-                })
-                // Handle any errors.
-                .then(undefined, (err) => {
-                    console.error(err);
-                    res.redirect('/404');
-                }); 
+            return acceptOffer(req, res, req.query.theOffer);
         } else if(req.query.action == 'reject') {
-            SwapModel.findOne({ _id: req.query.theSwap }).exec()
-                .then((swap) => {
-                    let results = [
-                        swap._userId,
-                        swap.item,
-                        swap._swapUserId,
-                        swap.swapItem
-                    ];
-
-                    return SwapModel.deleteOne({ _id: swap._id }).exec()
-                        .then(() => {
-                            return results;
-                        })
-                })
-                .then((results) => {
-                    var swapHolder = new SwapModel({
-                        _id: results[0] + '-' + results[1]._id,
-                        _userId: results[0],
-                        item: results[1],
-                        userRating: results[1].rating,
-                        status: 'Available'
-                    });
-
-                    return swapHolder.save()
-                        .then(() => {
-                            return results;
-                        })
-                })
-                .then((results) => {
-                    var swapHolder = new SwapModel({
-                        _id: results[2] + '-' + results[3]._id,
-                        _userId: results[2],
-                        item: results[3],
-                        userRating: results[3].rating,
-                        status: 'Available'
-                    });
-
-                    return swapHolder.save()
-                        .then(() => {
-                            return;
-                        })
-                })
-                .then(() => {
-                    return SwapModel.find({ _userId: req.session.theUser._id }).exec()
-                        .then((swaps) => {
-                            req.session.currentSwaps = swaps;
-                            res.redirect('/myswaps');
-                        })
-                })
-                // Handle any errors.
-                .then(undefined, (err) => {
-                    console.error(err);
-                    res.redirect('/404');
-                }); 
+            return rejectOffer(req, res, req.query.theOffer);
         } else {
             res.redirect('/mySwaps');
         }
@@ -232,107 +92,57 @@ app.get('/myswaps', (req, res) => {
 });
 
 app.get('/addItem', (req, res) => {
-    if(req.session.theUser && req.session.currentProfile && req.query.item) {
-        ItemModel.findOne({ _id: req.query.item }).exec()
-            .then((item) => {
-                var userItemsHolder = req.session.currentProfile.userItems;
-                userItemsHolder.push(item);
-
-                return UserProfileModel.findByIdAndUpdate(req.session.theUser._id, {
-                    userItems: userItemsHolder
-                }).exec()
-                    .then(() => {
-                        return item;
-                    })
-            })
-            .then((item) => {
-                var swapHolder = new SwapModel({
-                    _id: req.session.theUser._id + '-' + item._id,
-                    _userId: req.session.theUser._id,
-                    item: item,
-                    userRating: item.rating,
-                    status: 'Available',
-                    _swapUserId: undefined,
-                    swapItem: undefined,
-                    swapItemRating: undefined,
-                    swapUserRating: undefined
-                });
-
-                return swapHolder.save()
-                    .then(() => {
-                        return;
-                    })
-            })
-            .then(() => {
-                return UserProfileModel.findOne({ _id: req.session.theUser._id }).exec()
-                    .then((userprofile) => {
-                        req.session.currentProfile = userprofile;
-                        return;
-                    })
-            })
-            .then(() => {
-                return SwapModel.find({ _userId: req.session.theUser._id }).exec()
-                    .then((swaps) => {
-                        req.session.currentSwaps = swaps;
-                        return;
-                    })
-            })
-            .then(() => {
-                res.redirect('/myitems');
-            })
-            // Handle any errors.
-            .then(undefined, (err) => {
+    if(req.session.theUser && req.query.item) {
+        ItemModel.doesItemExist(req.query.item)
+            .then(() => UserModel.addUserItemById(req.session.theUser._id, req.query.item))
+            .then(user => req.session.theUser = user)
+            .then(() => res.redirect('/myitems'))
+            .catch(err => {
                 console.error(err);
                 res.redirect('/404');
-            }); 
+            });
     } else {
         res.redirect('/404');
     }
 });
 
-app.post('/createSwap', urlencodedParser, (req, res) => {
-    if(req.body.swap != undefined && req.body.swappedAlbum != undefined) {
-        // swapId represents the other user's item SwapModel _id.
-        var swapId = req.body.swap;
-        // itemId represents the user's item's SwapModel _id.
-        var itemId = req.body.swappedAlbum;
-
-        SwapModel.findOne( { _id: swapId} ).exec()
-            .then((swap) => {
-                return SwapModel.deleteOne( { _id: swapId } ).exec()
-                    .then(() => {
-                        return swap;
-                    });
+app.get('/mySwaps/createSwap', (req, res) => {
+    if(req.session.theUser) {
+        ItemModel.getItems(req.session.theUser.userItems)
+            .then(myItems => {
+                ItemModel.getItemsNotInArray(req.session.theUser.userItems)
+                    .then(otherItems => {
+                        res.render('createSwap', { title: 'CDXchange | Create Swap', myItems: myItems, otherItems: otherItems })
+                    })
             })
-            .then((swap) => {
-                return SwapModel.findByIdAndUpdate(itemId, {
-                    status: 'Pending',
-                    _swapUserId: swap._userId,
-                    swapItem: swap.item,
-                    swapItemRating: swap.item.rating,
-                    swapUserRating: undefined
-                }).exec()
-                    .then(() => {
-                        return;
-                    });
-            })
-            .then(() => {
-                getSwapsQuery(req.session.theUser._id, (error, doc) => {
-                    if(!error) {
-                        req.session.currentSwaps = doc;
-                    }
-
-                    res.redirect('/myswaps');
-                })
-            })
-            // Handle any errors.
-            .then(undefined, (err) => {
+            .catch(err => {
                 console.error(err);
                 res.redirect('/404');
-            });  
+            });
     } else {
-        res.redirect('/myswaps');
+        let message = "You must be logged in to view this page.";
+        res.status(403).render('403', { title: "CDXchange | 403: Access Denied", message: message });
     }
+});
+
+app.post('/mySwaps/createSwap', urlencodedParser, [
+    check('ownedItem').exists(),
+    check('wantedItem').exists()
+], (req, res) => {
+        const errors = validationResult(req);
+
+        if(!errors.isEmpty()) {
+            return res.status(422).render('422', { title: "CDXchange | 422: Unprocessable Entity", errors: errors.array() });
+        }
+
+        OfferModel.addOffer(req.session.theUser._id, req.body.ownedItem, req.body.wantedItem, undefined, 'Available')
+            .then(() => {
+                res.redirect('/mySwaps');
+            })
+            .catch(err => {
+                console.error(err);
+                res.redirect('/404');
+            });
 });
 
 // --- FUNCTIONS ---
@@ -395,7 +205,6 @@ function deleteItem(req, res, itemId) {
     UserModel.removeUserItemById(req.session.theUser._id, itemId)
         .then(user => req.session.theUser = user)
         .then(() => {
-            console.log(req.session.theUser);
             return OfferModel.getOfferByUserIdAndOwnedItem(req.session.theUser._id, itemId)
         })
         .then(offer => {
@@ -403,13 +212,7 @@ function deleteItem(req, res, itemId) {
                 OfferModel.deleteOffer(offer._id)
             }
         })
-        .then(() => {
-            return OfferModel.getOffersByUserId(req.session.theUser._id)
-        })
-        .then(offers => {
-            req.session.currentOffers = offers;
-            res.redirect('/myitems');
-        })
+        .then(() => res.redirect('/myitems'))
         .catch(err => {
             console.error(err);
             res.redirect('/404');
@@ -428,7 +231,7 @@ function viewMyItems(req, res) {
         .then(items => {
             results.push(items);
 
-            return ItemModel.getItemsNotOwned(req.session.theUser.userItems)
+            return ItemModel.getItemsNotInArray(req.session.theUser.userItems)
                 .then(otherItems => {
                     results.push(otherItems);
                     return results;
@@ -547,20 +350,130 @@ function viewMySwaps(req, res) {
  * @param {Number} offerId - The id for the offer in question.
  */
 function makeOfferToUser(req, res, offerId) {
-
+    OfferModel.matchFound(offerId, req.session.theUser._id)
+        .then(() => res.redirect('/myswaps'))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
 }
 
 /**
- * withdrawOffer(req, res, offerId) - Withdraws a user's owned offer.
+ * withdrawOwnOffer(req, res, offerId) - Withdraws a user's owned offer.
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * @param {Number} offerId - The id for the offer in question.
  */
-function withdrawOffer(req, res, offerId) {
+function withdrawOwnOffer(req, res, offerId) {
     OfferModel.deleteOffer(offerId)
         .then(() => res.redirect('/myswaps'))
         .catch(err => {
             console.error(err);
             res.redirect('/404');
         })
+}
+
+/**
+ * withdrawOtherOffer(req, res, offerId) - Withdraw from another user's offer.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {Number} offerId - The id for the offer in question.
+ */
+function withdrawOtherOffer(req, res, offerId) {
+    OfferModel.matchRescinded(offerId)
+        .then(() => res.redirect('/myswaps'))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+}
+
+/**
+ * acceptOffer(req, res, offerId) - Handles accepting an offer.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {Number} offerId - The id for the offer in question.
+ */
+function acceptOffer(req, res, offerId) {
+    OfferModel.getOfferById(offerId)
+        .then(offer => {
+            if(offer == null || offer.status != 'Pending' || offer._userId != req.session.theUser._id) {
+                res.redirect('/404');
+            } else {
+                return offer;
+            }
+        })
+        .then(offer => {
+            return UserModel.addUserItemById(offer._otherUserId, offer._ownedItemId)
+                .then(() => offer);
+        })
+        .then(offer => {
+            return UserModel.removeUserItemById(offer._otherUserId, offer._wantedItemId)
+                .then(() => offer);
+        })
+        .then(offer => {
+            return UserModel.addUserItemById(req.session.theUser._id, offer._wantedItemId)
+                .then(() => offer);
+        })
+        .then(offer => {
+            return UserModel.removeUserItemById(req.session.theUser._id, offer._ownedItemId)
+                .then(() => offer)
+        })
+        .then(offer => {
+            return OfferModel.updateStatus(offer._id, 'Swapped')
+        })
+        .then(() => {
+            return UserModel.getUserById(req.session.theUser._id)
+                .then(user => req.session.theUser = user)
+        })
+        .then(() => res.redirect('/myswaps'))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+}
+
+/**
+ * rejectOffer(req, res, offerId) - Handles rejecting an offer.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {Number} offerId - The id for the offer in question.
+ */
+function rejectOffer(req, res, offerId) {
+    OfferModel.matchRescinded(offerId)
+        .then(() => res.redirect('/myswaps'))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+}
+
+// --- PASSWORD FUNCTIONS ---
+/**
+ * genRandomString(length) - Generates a random string of the given length to be used as a salt.
+ * @param {Number} length - The length of the random string to be generated.
+ * @returns {String} 
+ */
+function genRandomString(length) {
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex') /** convert to hexadecimal format */
+            .slice(0,length);   /** return required number of characters */
+};
+
+/**
+ * sha256(password, salt) - Hashes a password with a salt using sha256.
+ *      Returns an object with the salt and the password hash.
+ * @param {String} password - The password to be hashed.
+ * @param {String} salt - The salt value to be used, refer to genRandomString.
+ * @returns {Object}
+ */
+function sha256(password, salt) {
+    let hash = crypto.createHmac('sha256', salt);
+    hash.update(password);
+    let value = hash.digest('hex');
+
+    return {
+        salt: salt,
+        passwordHash: value
+    };
 }

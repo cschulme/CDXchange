@@ -14,8 +14,8 @@ app.get('/categories', (req, res) => {
 app.get('/categories/:category', (req, res) => {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
-    if(utilityFunctions.validateCategory(category) && req.session.currentProfile) {
-        ItemModel.getItemsNotOwned(req.session.theUser.userItems)
+    if(utilityFunctions.validateCategory(category) && req.session.theUser) {
+        ItemModel.getItemsNotOwnedByCategory(req.session.theUser.userItems, category)
             .then(itemsNotOwned => res.render('category', { title: "CDXchange | " + category, category: category, items: itemsNotOwned}))
             .catch(err => {
                 console.error(err);
@@ -37,7 +37,7 @@ app.get('/categories/:category', (req, res) => {
 app.get('/categories/:category/:item', (req, res) => {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
-    if(utilityFunctions.validateCategory(category) && req.session.currentProfile) {
+    if(utilityFunctions.validateCategory(category) && req.session.theUser) {
         ItemModel.getItem(req.params.item)
             .then(item => {
                 let results = new Array();
@@ -65,7 +65,7 @@ app.get('/categories/:category/:item', (req, res) => {
             }) 
             .then(results => {
                 let userIds = new Array();
-                results[2].forEach(offer => userIds.push(offer));
+                results[2].forEach(offer => userIds.push(offer._userId));
 
                 return UserModel.getUsersInSetOfIds(userIds)
                     .then(docs => {
@@ -73,7 +73,7 @@ app.get('/categories/:category/:item', (req, res) => {
                         return results;
                     })
             })
-            .then(results => res.render('item', { title: "CDXchange | " + item.itemName, item: results[0], owned: results[1], swaps: results[2], swapUsers: results[3] }))
+            .then(results => res.render('item', { title: "CDXchange | " + results[0].itemName, item: results[0], owned: results[1], swaps: results[2], swapUsers: results[3] }))
             .catch(err => {
                 console.error(err);
                 res.redirect('/404');

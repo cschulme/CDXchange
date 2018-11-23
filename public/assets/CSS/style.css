@@ -402,6 +402,63 @@ td {
     margin-bottom: 20px;
 }
 
+/* --- Register Form --- */
+.form__register {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 30px;
+    grid-template-areas:
+        "column1 column2"
+        "submit submit";
+
+    min-height: 500px;
+}
+
+.form__register--column-1 {
+    grid-area: column1;
+}
+
+.form__register--column-2 {
+    grid-area: column2;
+}
+
+.form__register--cell {
+    display: flex;
+
+    height: 60px;
+    padding: 10px;
+}
+
+.form__register--cell label {
+    display: flex;
+    align-items: center;
+
+    width: 200px;
+    padding: 0px 15px;
+
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.form__register--cell input {
+    width: calc(100% - 200px);
+    font-size: 1.2rem;
+    border-radius: 15px;
+    outline: none;
+    border: none;
+    padding-left: 20px;
+}
+
+.form__register--submit {
+    grid-area: submit;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 30px;
+}
+
 
 /* === HEADER === */
 

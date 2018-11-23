@@ -42,10 +42,14 @@
                                                 <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
                                             <% } %>
                                         <% }) %>
-                                        <td>---</td>
+                                        <% myOffersItems.forEach(item => { %>
+                                            <% if(item._id == offer._wantedItemId) { %>
+                                                <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.artist %> - <%= item.itemName %></a></td>
+                                            <% } %>
+                                        <% }) %>
                                         <td>---</td>
                                         <td>Available</td>
-                                        <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
+                                        <td><a href="/mySwaps?action=withdrawOwnOffer&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
                                     </tr>
                                 <% } else if(offer.status == 'Pending') { %>
                                     <tr>
@@ -66,7 +70,10 @@
                                             <% } %>
                                         <% }) %>
                                         <td>Pending</td>
-                                        <td><a href="/mySwaps?action=withdraw&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Withdraw</a></td>
+                                        <td>
+                                            <a href="/mySwaps?action=accept&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Accept</a>
+                                            <a href="/mySwaps?action=reject&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Reject</a>
+                                        </td>
                                     </tr>
                                 <% } else if(offer.status == 'Swapped') { %>
                                     <tr>
@@ -146,8 +153,7 @@
                                             <td>You</td>
                                             <td>Pending</td>
                                             <td>
-                                                <a href="/mySwaps?action=accept&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Accept</a>
-                                                <a href="/mySwaps?action=reject&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Reject</a>
+                                                <a href="/mySwaps?action=withdrawOtherOffer&theOffer=<%= offer._id %>" class="button__bubble button__bubble--small">Withdraw</a>
                                             </td>
                                         </tr>
                                     <% } else if(offer.status == 'Swapped' && offer._otherUserId == theUser.id ) { %>
@@ -175,18 +181,19 @@
                                 <% }); %>
                             <% } %>
                         </table>
+                        <br>
+                        <a href="/mySwaps/createSwap" class="button__bubble button__bubble--medium">Create a swap offer</a>
                     <% } else if (theUser.user == true) { %>
                         <h3>There's no items to show!  Time to start adding some items to your account!</h3>
-                        <a href="#" class="button__bubble button__bubble--medium">Add some items</a>
+                        <a href="/mySwaps/createSwap" class="button__bubble button__bubble--medium">Create a swap offer</a>
                     <% } else { %>
                         <h3>There's no items to show!  Please log in.</h3>
                     <% } %>
                     <br>
-                    <a href="#" class="button__bubble button__bubble--medium">Create a swap offer</a>
                 </div>
             </section>
         </main>
-        
+    
         <%- include partials/footer.ejs %>
     </body>
 </html>

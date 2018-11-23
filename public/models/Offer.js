@@ -160,6 +160,19 @@ module.exports.matchFound = function(id, otherUserId) {
 }
 
 /**
+ * matchRescinded(id) - Resets a match to available and clears the matched user's id.
+ * @param {Number} id - The id of the offer.
+ * @returns {Promise<any>}
+ */
+module.exports.matchRescinded = function(id) {
+    return new Promise((resolve, reject) => {
+        Offer.findOneAndUpdate({ _id: id}, { _otherUserId: undefined, status: 'Available' }, { new: true })
+            .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    })
+}
+
+/**
  * deleteOffer(id) - Deletes an offer attached to a passed _id.
  *      Returns the deleted offer.
  * @param {Number} id - The id of the offer.

@@ -42,8 +42,10 @@ $(document).ready(function() {
     });
 
     $('.form__radio-button').click(function() {
-        $("#form--submit").prop('disabled', false)
-            .removeClass('button__bubble--inactive')
-            .addClass('button__bubble');
+        if($('.ownedItemRadio').is(':checked') && ($('.wantedItemRadio').is(':checked'))) {
+            $("#form--submit").prop('disabled', false)
+                .removeClass('button__bubble--inactive')
+                .addClass('button__bubble');
+        }        
     });
 });

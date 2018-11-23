@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/register" class="button__bar">Register</a>
+            </section>
+            <section class="content__shell">
+                <div class="content__wrapper">
+                    <h2 class="section--header">Register for CDXchange</h2>
+                    <form method="POST" class="form__register">
+                        <div class="form__register--column-1">
+                            <div class="form__register--cell">
+                                <label for="firstName">First Name:</label>
+                                <input type="text" name="firstName">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="lastName">Last Name:</label>
+                                <input type="text" name="lastName">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="email1">Email:</label>
+                                <input type="email" name="email1">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="email2">Retype Email:</label>
+                                <input type="email" name="email2">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="username">Username:</label>
+                                <input type="text" name="username">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="password1">Password:</label>
+                                <input type="password" name="password1">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="password2">Retype Password:</label>
+                                <input type="password" name="password2">
+                            </div>
+                        </div>
+                        <div class="form__register--column-2">
+                            <div class="form__register--cell">
+                                <label for="address1">Address:</label>
+                                <input type="text" name="address1">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="address2">Unit/Apartment:</label>
+                                <input type="text" name="address2">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="city">City:</label>
+                                <input type="text" name="city">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="area">State/Province:</label>
+                                <input type="text" name="area">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="postalCode">Postal Code:</label>
+                                <input type="text" name="postalCode">
+                            </div>
+                            <div class="form__register--cell">
+                                <label for="country">Country:</label>
+                                <input type="text" name="country">
+                            </div>
+                        </div>
+                        <div class="form__register--submit">
+                            <input type="submit" value="Sign Up!" class="button__bubble button__bubble--large">
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

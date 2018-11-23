@@ -19,7 +19,10 @@ const UserSchema = new mongoose.Schema({
         country: String
     },
     username: String,
-    password: String,
+    password: {
+        hash: String,
+        salt: String
+    },
     userItems: Array
 }, {
     toObject: {
@@ -137,7 +140,7 @@ module.exports.getUserItemsByUsername = function(username) {
 }
 
 /**
- * addUser(firstName, lastName, email, address1, address2, city, area, postalCode, country, username, password, userItems) -
+ * addUser(firstName, lastName, email, address1, address2, city, area, postalCode, country, username, hash, salt, userItems) -
  *      Creates a user document and adds it to the users collection.
  * @param {String} firstName - The user's first name.
  * @param {String} lastName - The user's last name.
@@ -149,11 +152,12 @@ module.exports.getUserItemsByUsername = function(username) {
  * @param {Number} postalCode - The user's postal code.
  * @param {String} country - The user's country.
  * @param {String} username - The user's selected username.
- * @param {String} password - The user's password.
+ * @param {String} hash - The generated hash.
+ * @param {String} salt - The generated salt.
  * @param {Array} userItems - An array of all the items the user has in their profile.
  * @returns {Promise<any>}
  */
-module.exports.addUser = function(firstName, lastName, email, address1, address2, city, area, postalCode, country, username, password, userItems) {
+module.exports.addUser = function(firstName, lastName, email, address1, address2, city, area, postalCode, country, username, hash, salt, userItems) {
     return new Promise((resolve, reject) => {
         let newUser = new User({
             firstName: firstName,
@@ -168,7 +172,10 @@ module.exports.addUser = function(firstName, lastName, email, address1, address2
                 country: country,
             },
             username: username,
-            password: password,
+            password: {
+                hash: hash,
+                salt: salt
+            },
             userItems: userItems
         });
     
@@ -224,19 +231,19 @@ module.exports.updateUserByUsername = function(username, update) {
 /**
  * addUserItemById(id, item) - Finds a user by their id, and adds an item to their userItems array.
  * @param {Number} id - The id of the user.
- * @param {Ojbect} item - The item object to add to the userItems array.
+ * @param {String} itemId - The item object to add to the userItems array.
  * @returns {Promise<any>}
  */
-module.exports.addUserItemById = function(id, item) {
+module.exports.addUserItemById = function(id, itemId) {
     return new Promise((resolve, reject) => {
         User.findOne({ _id: id })
             .then(doc => {
                 // Create a copy of the user's userItems array.
                 let userItemsCopy = doc.userItems.slice();
 
-                userItemsCopy.push(item);
+                userItemsCopy.push(itemId);
 
-                return(userItemsCopy)
+                return userItemsCopy;
             })
             .then(userItemsCopy => {
                 return User.findOneAndUpdate(
@@ -313,17 +320,17 @@ module.exports.addUserItemByUsername = function(username, item) {
  * removeUserItemById(id, item) - Finds a user by their id, and removes an item from their userItems array,
  *      returning the new user.  If no item is found, the user is returned unchanged.
  * @param {Number} id - The id of the user.
- * @param {Object} item - The item object to remove from the userItems array.
+ * @param {String} itemId - The id of the item to remove.
  * @returns {Promise<any>}
  */
-module.exports.removeUserItemById = function(id, item) {
+module.exports.removeUserItemById = function(id, itemId) {
     return new Promise((resolve, reject) => {
         User.findOne({ _id: id })
             .then(doc => {
                 let userItemsCopy = new Array();
 
                 doc.userItems.forEach(userItem => {
-                    if(userItem != item) {
+                    if(userItem != itemId) {
                         userItemsCopy.push(userItem);
                     }
                 })
@@ -446,14 +453,14 @@ module.exports.changePasswordByUsername = function(username, newPassword) {
 /**
  * login(username, password) - Returns the user profile if the correct password is passed.
  * @param {String} username - The passed username.
- * @param {String} password - The passed password.
+ * @param {String} hashedPassword - The hashed password.
  * @returns {Promise<any>}
  */
-module.exports.login = function(username, password) {
+module.exports.login = function(username, hashedPassword) {
     return new Promise((resolve, reject) => {
         User.findOne({ username: username })
             .then(user => {
-                if(password == user.password) {
+                if(hashedPassword == user.password.hash) {
                     resolve(user);
                 } else {
                     reject("Wrong password given.");

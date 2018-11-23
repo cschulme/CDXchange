@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/mySwaps" class="button__bar">My Swaps</a> > 
+                <a href="/mySwaps/createSwap" class="button__bar">Create Swap</a>
+            </section>
+            <section class="content__shell">
+                <div class="content__wrapper">
+                    <form method="POST" action="/mySwaps/createSwap">
+                        <h2 class="section--header">I want to swap...</h2>
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th colspan="2">Album</th>
+                                <th>Artist</th>
+                                <th>Category</th>
+                                <th>Rating</th>
+                            </tr>
+                            <% myItems.forEach(item => { %>
+                                <tr>
+                                    <td><input type="radio" name="ownedItem" value="<%= item._id %>" class="form__radio-button ownedItemRadio"></td>
+                                    <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                    <td><%= item.artist %></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                    <td>
+                                        <span class="rating">
+                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                                <i class="fas fa-star checked"></i>
+                                            <% } %>
+                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                                <i class="fas fa-star"></i>
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </table>
+                        <br>
+                        <h2 class="section--header">...for...</h2>
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th colspan="2">Album</th>
+                                <th>Artist</th>
+                                <th>Category</th>
+                                <th>Rating</th>
+                            </tr>
+                            <% otherItems.forEach(item => { %>
+                                <tr>
+                                    <td><input type="radio" name="wantedItem" value="<%= item._id %>" class="form__radio-button wantedItemRadio"></td>
+                                    <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                    <td><%= item.artist %></td>
+                                    <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                    <td>
+                                        <span class="rating">
+                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                                <i class="fas fa-star checked"></i>
+                                            <% } %>
+                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                                <i class="fas fa-star"></i>
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </table>
+                        <br>
+                        <input type="submit" value="Create Swap" class="button__bubble--inactive button__bubble--large" id="form--submit" disabled>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+        
+        <%- include partials/footer.ejs %>
+    </body>
+</html>
