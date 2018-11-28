@@ -22,66 +22,175 @@
             <section class="content__shell">
                 <div class="content__wrapper">
                     <h2 class="section--header">Register for CDXchange</h2>
-                    <form method="POST" class="form__register">
-                        <div class="form__register--column-1">
-                            <div class="form__register--cell">
-                                <label for="firstName">First Name:</label>
+
+                    <% if(errors && errors.length > 0) { %>
+                        <!-- ERRORS -->
+                        <div class="registration-errors">
+                            <h3 class="registration-errors__header">The following error(s) occured: </h3>
+                            <ul>
+                                <% errors.forEach(error => { %>
+                                    <li><%= error.msg %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+
+                    <form method="POST" action="/register" class="form__register">
+                        <!-- Username/Password -->
+                        <h3>Username and Password</h3>
+                        <span class="form__register--field">
+                            <label for="username">Username</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('username')) { %>
+                                    <input class="input--error" type="text" name="username">
+                                <% } else { %>
+                                    <input type="text" name="username" value="<%= userInput.get('username') %>" placeholder="Note: Your username will be case-sensitive.">
+                                <% } %>
+                            <% } else { %>
+                                <input type="text" name="username" placeholder="Note: Your username will be case-sensitive.">
+                            <% } %>
+                            
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="password">Password</label>
+                            <% if (errors && errorParams.includes('password')) { %>
+                                <input class="input--error" type="password" name="password">
+                            <% } else { %>
+                                <input type="password" name="password" placeholder="Note: Your password will also be case-sensitive.">
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="passwordConfirm">Retype Password</label>
+                            <% if (errors && errorParams.includes('passwordConfirm')) { %>
+                                <input class="input--error" type="password" name="passwordConfirm">
+                            <% } else { %>
+                                <input type="password" name="passwordConfirm">
+                            <% } %>
+                        </span>
+
+                        <br><hr>
+
+                        <!-- Personal Info -->
+                        <h3>Personal Info <span class="subheader"><i class="fas fa-info-circle"></i> Used for sending and recieving CDs – Only your city and country will be public</span></h3>
+                        <span class="form__register--field">
+                            <label for="firstName">First Name</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('firstName')) { %>
+                                    <input class="input--error" type="text" name="firstName">
+                                <% } else { %>
+                                    <input type="text" name="firstName" value="<%= userInput.get('firstName') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="firstName">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="lastName">Last Name:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="lastName">Last Name</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('lastName')) { %>
+                                    <input class="input--error" type="text" name="lastName">
+                                <% } else { %>
+                                    <input type="text" name="lastName" value="<%= userInput.get('lastName') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="lastName">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="email1">Email:</label>
-                                <input type="email" name="email1">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="email2">Retype Email:</label>
-                                <input type="email" name="email2">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="username">Username:</label>
-                                <input type="text" name="username">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="password1">Password:</label>
-                                <input type="password" name="password1">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="password2">Retype Password:</label>
-                                <input type="password" name="password2">
-                            </div>
-                        </div>
-                        <div class="form__register--column-2">
-                            <div class="form__register--cell">
-                                <label for="address1">Address:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="Email">Email</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('email')) { %>
+                                    <input class="input--error" type="email" name="email">
+                                <% } else { %>
+                                    <input type="email" name="email" value="<%= userInput.get('email') %>">
+                                <% } %>
+                            <% } else { %>
+                                <input type="email" name="email">
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="address1">Address</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('address1')) { %>
+                                    <input class="input--error" type="text" name="address1">
+                                <% } else { %>
+                                    <input type="text" name="address1" value="<%= userInput.get('address1') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="address1">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="address2">Unit/Apartment:</label>
-                                <input type="text" name="address2">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="city">City:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="address2">Unit/Apartment</label>
+                            <% if (errors) { %>
+                                <input type="text" name="address2" placeholder="Optional" value="<%= userInput.get('address2') %>">
+                            <% } else { %>
+                                <input type="text" name="address2" placeholder="Optional">
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="city">City</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('city')) { %>
+                                    <input class="input--error" type="text" name="city">
+                                <% } else { %>
+                                    <input type="text" name="city" value="<%= userInput.get('city') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="city">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="area">State/Province:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="area">State/Province</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('area')) { %>
+                                    <input class="input--error" type="text" name="area">
+                                <% } else { %>
+                                    <input type="text" name="area" value="<%= userInput.get('area') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="area">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="postalCode">Postal Code:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="postalCode">Postal Code</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('postalCode')) { %>
+                                    <input class="input--error" type="text" name="postalCode">
+                                <% } else { %>
+                                    <input type="text" name="postalCode" value="<%= userInput.get('postalCode') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="postalCode">
-                            </div>
-                            <div class="form__register--cell">
-                                <label for="country">Country:</label>
+                            <% } %>
+                        </span>
+                        <br>
+                        <span class="form__register--field">
+                            <label for="country">Country</label>
+                            <% if (errors) { %>
+                                <% if (errorParams.includes('country')) { %>
+                                    <input class="input--error" type="text" name="country">
+                                <% } else { %>
+                                    <input type="text" name="country" value="<%= userInput.get('country') %>">
+                                <% } %>
+                            <% } else { %>
                                 <input type="text" name="country">
-                            </div>
-                        </div>
-                        <div class="form__register--submit">
-                            <input type="submit" value="Sign Up!" class="button__bubble button__bubble--large">
-                        </div>
+                            <% } %>
+                        </span>
+                        <br>
+
+                        <span class="form__register--submit">
+                            <input type="submit" value="Register" class="button__bubble button__bubble--large">
+                        </span>
                     </form>
                 </div>
             </section>

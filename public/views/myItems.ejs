@@ -20,7 +20,7 @@
                 <a href="/myitems" class="button__bar">My CDs</a>
             </section>
             <section class="content__shell">
-                <div class="content__wrapper">
+                <div class="content__wrapper content__wrapper--extended">
                     <h2 class="section--header">Your CDs for Swap</h2>
                     <% if(typeof items !== 'undefined' && items.length > 0) { %>
                         <table>
@@ -40,10 +40,10 @@
                                     <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
                                     <td>
                                         <span class="rating">
-                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                            <% for(var j = 1; j <= item.rating.value; j++) { %>
                                                 <i class="fas fa-star checked"></i>
                                             <% } %>
-                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                            <% for(var j = 5; j > item.rating.value; j--) { %>
                                                 <i class="fas fa-star"></i>
                                             <% } %>
                                         </span>

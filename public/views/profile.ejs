@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+                <a href="/" class="button__bar">Home</a> > 
+                <a href="/profile?user=<%= user._id %>" class="button__bar"><%= user.username %>'s Profile</a>
+            </section>
+            <section class="content__shell">
+                <div class="content__wrapper">
+                    <div class="profile-content__info">
+                        <img src="/Images/ProfileImages/DefaultProfileImage.jpg" alt="Default Profile Image" class="profile-content__info--image">
+                        <div class="profile-content__info--data">
+                            <div class="profile-content__info--data-header">
+                                <h2><%= user.username %></h2>
+                            </div>
+                            <h3><%= user.address.city %>, <%= user.address.area %>, <%= user.address.country %></h3>
+                            <p>
+                                <span class="paragraph-header">Items: </span><%= userItems.length %><br>
+                                <span class="paragraph-header">Item Reviews: </span><%= reviewCount %><br>
+                                <span class="paragraph-header">Active Swaps: </span><%= swapCount %>
+                            </p>
+                        </div>
+                    </div>
+
+                    <% if(recentFeedback.length > 0) { %>
+                        <br>
+                        <div class="album-feedback">
+                            <h3 class="subsection__header">Most Recent Reviews:</h3>
+                            <% recentFeedback.forEach(review => { %>
+                                <% recentFeedbackItems.forEach(item => { %>
+                                    <% if(review._itemId == item._id) { %>
+                                        <div class="album-feedback__review">
+                                            <img src="/Images/AlbumCovers/<%= item._id %>.jpg" class="album-feedback__review--image">
+                                            <div class="album-feedback__review--info">
+                                                <h4><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__simple"><%= item.artist %> - <%= item.itemName %></a></h4>
+                                                <span class="rating">
+                                                    <% for(let j = 1; j <= review.starRating; j++) { %>
+                                                        <i class="fas fa-star checked"></i>
+                                                    <% } %>
+                                                    <% for(let j = 5; j > review.starRating; j--) { %>
+                                                        <i class="fas fa-star"></i>
+                                                    <% } %>
+                                                </span>
+                                                <p><span class="paragraph-header">Posted: </span><%= review.postedOn.getMonth() + 1 %>-<%= review.postedOn.getDate() %>-<%= review.postedOn.getFullYear() %></p>
+                                                <% if(review.comment != '') { %>
+                                                    <p><span class="paragraph-header">Comment: </span><%= review.comment %></p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            <% }); %> 
+                        </div>
+                    <% } %>
+
+                    <% if(userItems.length > 0) { %>
+                        <br>
+                        <div class="user-items">
+                            <h3 class="subsection__header"><%= user.username %>'s Items:</h3>
+                            <table>
+                                <tr>
+                                    <th>Album</th>
+                                    <th>Artist</th>
+                                    <th>Year</th>
+                                    <th>Category</th>
+                                </tr>
+                                <% userItems.forEach(item => { %>
+                                    <tr>
+                                        <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
+                                        <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
+                                        <td><%= item.year %></td>
+                                        <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
+                                    </tr>
+                                <% }); %>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

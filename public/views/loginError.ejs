@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <%- include partials/head.ejs %>    
+    </head>
+
+    <body>
+        <%- include partials/header.ejs %>
+
+        <%- include partials/user-navigation.ejs %>
+
+        <%- include partials/site-navigation.ejs %>
+
+        <!-- Main Content Area -->
+        <main>
+            <section id="breadcrumb">
+                <button name="back" class="button__bubble button__bubble--small" onclick="history.back()">Go Back</button>
+            </section>
+            <section class="content content--centered static">
+                <div class="content__wrapper">
+                    <h2>Oops!</h2>
+                    <h3>Looks like the wrong username or password was given.  Try again:</h3>
+                    <br>
+                    <form method="POST" action="/signin" class="sign-in__form sign-in__form--error">
+                        <h2 class="heading__no-after">Sign In</h2>
+                        <h3>NOTE: Username and password are case sensitive.</h3>
+                        <label for="username">Username</label>
+                        <input type="text" name="username">
+                        <label for="password">Password</label>
+                        <input type="password" name="password">
+                        <input type="hidden" name="cameFromError" value="true">
+                        <input type="submit" value="Sign In" class="button__bubble button__bubble--large">
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <%- include partials/footer.ejs %>
+    </body>
+</html>

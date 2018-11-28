@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const ItemModel = require('../models/Item');
 const UserModel = require('../models/User');
 const OfferModel = require('../models/Offer');
-
+const ItemFeedbackModel = require('../models/ItemFeedback');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -17,10 +17,14 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.post('/signin', urlencodedParser, [
     check('username')
         .exists()
-        .isLength({ min: 1 }).withMessage("Username must not be empty."),
+        .isLength({ min: 1 }).withMessage("Username must not be empty.")
+        .trim()
+        .escape(),
     check('password')
         .exists()
         .isLength({ min: 1 }).withMessage("Password must not be empty.")
+        .trim()
+        .escape()
 ], (req, res) => {
     const errors = validationResult(req);
 
@@ -32,11 +36,15 @@ app.post('/signin', urlencodedParser, [
         .then(user => hashedPassword = sha256(req.body.password, user.password.salt))
         .then(hashedPassword => UserModel.login(req.body.username, hashedPassword.passwordHash))
         .then(user => req.session.theUser = user)
-        .then(() => res.redirect('back'))
-        .catch(err => {
-            console.error(err);
-            let message = "Sign in failed.";
-            res.status(404).render('404', { title: "CDXchange | 404: Page Not Found", message: message });
+        .then(() => {
+            if(req.body.cameFromError) {
+                res.redirect('/');
+            } else {
+                res.redirect('back');
+            }
+        })
+        .catch(() => {
+            res.render('loginError', { title: "CDXchange | Login Error ", fromError: true });
         });
 });
 
@@ -46,11 +54,180 @@ app.get('/signout', (req, res) => {
         req.session.theUser = undefined;
     }
     res.redirect('/');
-})
+});
 
 app.get('/register', (req, res) => {
-    res.render('register', { title: "CDXchange | My CDs" });
-})
+    res.render('register', { title: "CDXchange | My CDs", errors: undefined });
+});
+
+app.post('/register', urlencodedParser, [
+    check('username')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Username: 'Username' was left blank.")
+        .custom(value => {
+            return UserModel.getUserByUsername(value)
+                .then(user => {
+                    if(user == null) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    return false;
+                })
+        }).withMessage("Username: That username is already taken.")
+        .trim(),
+    check('password')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Password: 'Password' was left blank.")
+        .trim(),
+    check('passwordConfirm')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Password: 'Retype Password' was left blank.")
+        .custom((value, { req }) => value == req.body.password).withMessage("Password: The two password fields don't match.")
+        .trim(),
+    check('firstName')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("First Name: 'First Name' was left blank.")
+        .isString()
+        .trim(),
+    check('lastName')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Last Name: 'Last Name' was left blank.")
+        .isString()
+        .trim(),
+    check('email')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Email: 'Email' was left blank.")
+        .isEmail().withMessage("Email: Your input does not appear to be an email.")
+        .trim()
+        .normalizeEmail(),
+    check('address1')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Address: 'Address' was left blank.")
+        .isString()
+        .trim(),
+    check('address2')
+        .trim(),
+    check('city')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("City: 'City' was left blank.")
+        .isString()
+        .trim(),
+    check('area')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("State/Province: 'State/Province' was left blank.")
+        .isString()
+        .trim(),
+    check('postalCode')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Postal Code: 'Postal Code' was left blank.")
+        .isInt().withMessage("Postal Code: You did not pass a valid postal code.")
+        .trim(),
+    check('country')
+        .custom(value => {
+            if(value && value != '') {
+                return true;
+            } else {
+                return false;
+            }
+        }).withMessage("Country: 'Country' was left blank.")
+        .isString()
+        .trim()
+], (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        return registrationError(req, res, errors);
+    } else {
+        let salt = generateSalt(16);
+        let hash = sha256(req.body.password, salt);
+
+        UserModel.addUser(
+            req.body.firstName,
+            req.body.lastName,
+            req.body.email,
+            req.body.address1,
+            req.body.address2,
+            req.body.city,
+            req.body.area,
+            req.body.postalCode,
+            req.body.country,
+            req.body.username,
+            hash.passwordHash,
+            salt,
+            []
+        )
+            .then(user => {
+                req.session.theUser = user;
+                res.redirect('/myItems');
+            })
+            .catch(err => {
+                console.error(err);
+                res.redirect('/404');
+            })
+    }    
+});
+
+app.get('/profile', (req, res) => {
+    if(req.query.user) {
+        return viewProfile(req, res, req.query.user);
+    } else {
+        res.redirect('/404');
+    }
+});
 
 app.get('/myitems', function(req, res) {
     if(req.session.theUser && req.query.action && req.query.theItem) {
@@ -108,12 +285,49 @@ app.get('/addItem', (req, res) => {
 
 app.get('/mySwaps/createSwap', (req, res) => {
     if(req.session.theUser) {
+        let results = new Array();
+
         ItemModel.getItems(req.session.theUser.userItems)
             .then(myItems => {
-                ItemModel.getItemsNotInArray(req.session.theUser.userItems)
-                    .then(otherItems => {
-                        res.render('createSwap', { title: 'CDXchange | Create Swap', myItems: myItems, otherItems: otherItems })
+                results.push(myItems);
+                return results;
+            })
+            .then(results => {
+                return OfferModel.getOffersByUserId(req.session.theUser._id)
+                    .then(offers => {
+                        results.push(offers);
+                        return results;
                     })
+            })
+            .then(results => {
+                let swappableItems = new Array();
+
+                results[0].forEach(item => {
+                    let involvedInSwap = false;
+
+                    results[1].forEach(offer => {
+                        if(offer._ownedItemId == item._id && offer.status != 'Swapped') {
+                            involvedInSwap = true;
+                        }
+                    });
+
+                    if(involvedInSwap == false) {
+                        swappableItems.push(item);
+                    }
+                })
+
+                results.push(swappableItems);
+                return results;
+            })
+            .then(results => {
+                return ItemModel.getItemsNotInArray(req.session.theUser.userItems)
+                    .then(items => {
+                        results.push(items);
+                        return results;
+                    })
+            })
+            .then(results => {
+                res.render('createSwap', { title: 'CDXchange | Create Swap', myItems: results[2], otherItems: results[3], userItems: results[0] });
             })
             .catch(err => {
                 console.error(err);
@@ -209,7 +423,9 @@ function deleteItem(req, res, itemId) {
         })
         .then(offer => {
             if(offer != null) {
-                OfferModel.deleteOffer(offer._id)
+                return OfferModel.deleteOffer(offer._id);
+            } else {
+                return;
             }
         })
         .then(() => res.redirect('/myitems'))
@@ -448,13 +664,114 @@ function rejectOffer(req, res, offerId) {
         })
 }
 
+/**
+ * viewProfile(req, res, userId) - Handles viewing a user's profile.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {Number} userId - The userId from the parameter.
+ */
+function viewProfile(req, res, userId) {
+    let results = new Array();
+
+    UserModel.getUserById(userId)
+        .then(user => {
+            if(user != null) {
+                let title = "CDXchange | " + user.username + "'s Profile";
+                results.push(title);
+                results.push(user);
+
+                return results;
+            } else {
+                let message = "This user does not exist.";
+                res.status(404).render('404', { title: 'CDXchange | 404: Page Not Found', message: message });
+            }
+        })
+        .then(results => {
+            return ItemFeedbackModel.getFeedbackByUser(userId, 3)
+                .then(feedback => {
+                    results.push(feedback);
+                    return results;
+                })
+        })
+        .then(results => {
+            let itemIds = new Array();
+
+            results[2].forEach(review => itemIds.push(review._itemId));
+
+            return ItemModel.getItems(itemIds)
+                .then(items => {
+                    results.push(items);
+                    return results;
+                })
+        })
+        .then(results => {
+            return ItemModel.getItems(results[1].userItems)
+                .then(items => {
+                    results.push(items);
+                    return results;
+                })
+        })
+        .then(results => {
+            return ItemFeedbackModel.getNumberOfReviewsByUser(userId)
+                .then(count => {
+                    results.push(count);
+                    return results;
+                })
+        })
+        .then(results => {
+            return OfferModel.getNumberOfOffersInvolvingAUser(userId)
+                .then(count => {
+                    results.push(count);
+                    return results;
+                })
+        })
+        .then(results => {
+            res.render('profile', { title: results[0], user: results[1], recentFeedback: results[2], recentFeedbackItems: results[3], userItems: results[4], reviewCount: results[5], swapCount: results[6] });
+        })
+        .catch(err => {
+            console.log(err);
+            res.redirect('/404');
+        })
+}
+
+/**
+ * registrationError(req, res, errors) - Handles registration errors.
+ * @param {Request} req - The request object. 
+ * @param {Response} res - The response object.
+ * @param {Object} errors - The errors object.
+ */
+function registrationError(req, res, errors) {
+    // Cast the errors into an array.
+    let errorArray = errors.array();
+
+    // Create a map of the user's input.
+    let userInputMap = new Map();
+
+    let userInput = Object.entries(req.body);
+
+    for(let [field, value] of userInput) {
+        if(field != 'password' && field != 'passwordConfirm') {
+            userInputMap.set(field, value);
+        }
+    }
+
+    // Create an array of fields that had errors.
+    let errorParams = new Array();
+
+    errorArray.forEach(error => {
+        errorParams.push(error.param);
+    })
+
+    res.render('register', { title: "CDXchange | My CDs", errors: errorArray, errorParams: errorParams, userInput: userInputMap });
+}
+
 // --- PASSWORD FUNCTIONS ---
 /**
- * genRandomString(length) - Generates a random string of the given length to be used as a salt.
+ * generateSalt(length) - Generates a random string of the given length to be used as a salt.
  * @param {Number} length - The length of the random string to be generated.
  * @returns {String} 
  */
-function genRandomString(length) {
+function generateSalt(length) {
     return crypto.randomBytes(Math.ceil(length/2))
             .toString('hex') /** convert to hexadecimal format */
             .slice(0,length);   /** return required number of characters */
@@ -464,7 +781,7 @@ function genRandomString(length) {
  * sha256(password, salt) - Hashes a password with a salt using sha256.
  *      Returns an object with the salt and the password hash.
  * @param {String} password - The password to be hashed.
- * @param {String} salt - The salt value to be used, refer to genRandomString.
+ * @param {String} salt - The salt value to be used, refer to generateSalt.
  * @returns {Object}
  */
 function sha256(password, salt) {

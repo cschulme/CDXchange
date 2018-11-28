@@ -4,6 +4,7 @@ const db = require('./db');
 const ItemModel = require('./models/Item');
 const UserModel = require('./models/User');
 const OfferModel = require('./models/Offer');
+const ItemFeedbackModel = require('./models/ItemFeedback');
 
 /*
  * Resets and populates the database.
@@ -24,12 +25,21 @@ module.exports.resetDb = () => {
         // Status update.
         .then(() => {
             console.log("Offer collection empited.");
+            ItemFeedbackModel.ItemFeedback.deleteMany({}).exec();
+        })
+        .then(() => {
+            console.log("Item Feedback collection emptied.");
             console.log("Beginning database population...");
         })
         // Populate items collection.
         .then(() => {
             let cds = [
-                { _id: 'TaylorSwift-1989', itemName: '1989', artist: 'Taylor Swift', year: 2014, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: 'On 1989, Taylor Swift fully embraces her shift to synth pop, with stadium-ready anthems and harrowing ballads.', rating: 4,
+                { _id: 'TaylorSwift-1989', itemName: '1989', artist: 'Taylor Swift', year: 2014, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: 'On 1989, Taylor Swift fully embraces her shift to synth pop, with stadium-ready anthems and harrowing ballads.',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Welcome To New York', artists: ['Taylor Swift'], length: '3:32' },
                         { number: 2, title: 'Blank Space', artists: ['Taylor Swift'], length: '3:51' },
@@ -46,7 +56,12 @@ module.exports.resetDb = () => {
                         { number: 13, title: 'Clean', artists: ['Taylor Swift'], length: '4:31' }
                     ]
                 },
-                { _id: 'TaylorSwift-Reputation', itemName: 'Reputation', artist: 'Taylor Swift', year: 2017, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: '', rating: 3,
+                { _id: 'TaylorSwift-Reputation', itemName: 'Reputation', artist: 'Taylor Swift', year: 2017, recordLabel: 'Big Machine', catalogCategory: 'Pop', description: '',
+                    rating: {
+                        value: 3,
+                        actualValue: 3,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: '...Ready for It?', artists: ['Taylor Swift'], length: '3:28' },
                         { number: 2, title: 'End Game', artists: ['Taylor Swift', 'Ed Sheeran', 'Future'], length: '4:04' },
@@ -65,7 +80,12 @@ module.exports.resetDb = () => {
                         { number: 15, title: 'New Year\'s Day', artists: ['Taylor Swift'], length: '3:55' }
                     ]
                 },
-                { _id: 'TroyeSivan-Bloom', itemName: 'Bloom', artist: 'Troye Sivan', year: 2018, recordLabel: 'EMI Australia', catalogCategory: 'Pop', description: 'Pulling inspiration from Bowie to Madonna, Bloom reimagines glam in the 21st century.', rating: 5,
+                { _id: 'TroyeSivan-Bloom', itemName: 'Bloom', artist: 'Troye Sivan', year: 2018, recordLabel: 'EMI Australia', catalogCategory: 'Pop', description: 'Pulling inspiration from Bowie to Madonna, Bloom reimagines glam in the 21st century.',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Seventeen', artists: ['Troye Sivan'], length: '3:38' },
                         { number: 2, title: 'My My My!', artists: ['Troye Sivan'], length: '3:25' },
@@ -79,7 +99,12 @@ module.exports.resetDb = () => {
                         { number: 10, title: 'Animal', artists: ['Troye Sivan'], length: '4:25' }
                     ]
                 },
-                { _id: 'CharliXCX-Pop2', itemName: 'Pop 2', artist: 'Charli XCX', year: 2017, recordLabel: 'Asylum', catalogCategory: 'Pop', description: 'The second of a 2 part mixtape collection, Pop 2 features party bangers with collaboraters from Tove Lo to CupcakKe.', rating: 4,
+                { _id: 'CharliXCX-Pop2', itemName: 'Pop 2', artist: 'Charli XCX', year: 2017, recordLabel: 'Asylum', catalogCategory: 'Pop', description: 'The second of a 2 part mixtape collection, Pop 2 features party bangers with collaboraters from Tove Lo to CupcakKe.',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Backseat', artists: ['Charli XCX', 'Carly Rae Jepsen'], length: '3:58' },
                         { number: 2, title: 'Out Of My Head', artists: ['Charli XCX', 'Carly Rae Jepsen', 'Alma'], length: '3:56' },
@@ -93,7 +118,12 @@ module.exports.resetDb = () => {
                         { number: 10, title: 'Track 10', artists: ['Charli XCX'], length: '5:26' }
                     ]
                 },
-                { _id: 'WalkTheMoon-TalkingIsHard', itemName: 'Talking is Hard', artist: 'Walk the Moon', year: 2014, recordLabel: 'RCA Records', catalogCategory: 'Alternative', description: '', rating: 4,
+                { _id: 'WalkTheMoon-TalkingIsHard', itemName: 'Talking is Hard', artist: 'Walk the Moon', year: 2014, recordLabel: 'RCA Records', catalogCategory: 'Alternative', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Different Colors', artists: ['Walk The Moon'], length: '3:42' },
                         { number: 2, title: 'Sidekick', artists: ['Walk The Moon'], length: '2:55' },
@@ -109,7 +139,12 @@ module.exports.resetDb = () => {
                         { number: 12, title: 'Aquaman', artists: ['Walk The Moon'], length: '3:59' }
                     ]
                 },
-                { _id: 'FooFighters-TheColourAndTheShape', itemName: 'The Colour and the Shape', artist: 'Foo Fighters', year: 1997, recordLabel: 'Capitol Records', catalogCategory: 'Alternative', description: '', rating: 5,
+                { _id: 'FooFighters-TheColourAndTheShape', itemName: 'The Colour and the Shape', artist: 'Foo Fighters', year: 1997, recordLabel: 'Capitol Records', catalogCategory: 'Alternative', description: '',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Doll', artists: ['Foo Fighters'], length: '1:23' },
                         { number: 2, title: 'Monkey Wrench', artists: ['Foo Fighters'], length: '3:51' },
@@ -126,7 +161,12 @@ module.exports.resetDb = () => {
                         { number: 13, title: 'New Way Home', artists: ['Foo Fighters'], length: '5:40' }
                     ]
                 },
-                { _id: 'Nirvana-InUtero', itemName: 'In Utero', artist: 'Nirvana', year: 1993, recordLabel: 'DGC', catalogCategory: 'Alternative', description: '', rating: 4,
+                { _id: 'Nirvana-InUtero', itemName: 'In Utero', artist: 'Nirvana', year: 1993, recordLabel: 'DGC', catalogCategory: 'Alternative', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Serve the Servants', artists: ['Nirvana'], length: '3:36' },
                         { number: 2, title: 'Scentless Apprentice', artists: ['Nirvana'], length: '3:48' },
@@ -142,7 +182,12 @@ module.exports.resetDb = () => {
                         { number: 12, title: 'All Apologies', artists: ['Nirvana'], length: '3:51' }
                     ]
                 },
-                { _id: 'PinkFloyd-DarkSideOfTheMoon', itemName: 'Dark Side of the Moon', artist: 'Pink Floyd', year: 1973, recordLabel: 'Harvest', catalogCategory: 'Rock', description: 'One of the best selling albums of all time, Dark Side of the Moon paved the way for psychadelic rock.', rating: 5,
+                { _id: 'PinkFloyd-DarkSideOfTheMoon', itemName: 'Dark Side of the Moon', artist: 'Pink Floyd', year: 1973, recordLabel: 'Harvest', catalogCategory: 'Rock', description: 'One of the best selling albums of all time, Dark Side of the Moon paved the way for psychadelic rock.',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Speak to Me', artists: ['Pink Floyd'], length: '1:30' },
                         { number: 2, title: 'Breathe', artists: ['Pink Floyd'], length: '2:43' },
@@ -156,7 +201,12 @@ module.exports.resetDb = () => {
                         { number: 10, title: 'Eclipse', artists: ['Pink Floyd'], length: '2:03' }
                     ]
                 },
-                { _id: 'PinkFloyd-WishYouWereHere', itemName: 'Wish You Were Here', artist: 'Pink Floyd', year: 1975, recordLabel: 'Columbia Records', catalogCategory: 'Rock', description: 'Wish You Were Here details the band\'s attempt to deal with the loss of their former bandmate, Syd Barrett.', rating: 4,
+                { _id: 'PinkFloyd-WishYouWereHere', itemName: 'Wish You Were Here', artist: 'Pink Floyd', year: 1975, recordLabel: 'Columbia Records', catalogCategory: 'Rock', description: 'Wish You Were Here details the band\'s attempt to deal with the loss of their former bandmate, Syd Barrett.',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Shine On You Crazy Diamond, Parts I-V', artists: ['Pink Floyd'], length: '13:19' },
                         { number: 2, title: 'Welcome to the Machine', artists: ['Pink Floyd'], length: '7:27' },
@@ -165,7 +215,12 @@ module.exports.resetDb = () => {
                         { number: 5, title: 'Shine On You Crazy Diamond, Parts VI-IX', artists: ['Pink Floyd'], length: '12:23' }
                     ]
                 },
-                { _id: 'PinkFloyd-TheWall', itemName: 'The Wall', artist: 'Pink Floyd', year: 1977, recordLabel: 'Harvest', catalogCategory: 'Rock', description: 'The Wall chronicles the story of Pink, a character whose life pushes him further and further into complete alienation from other people.', rating: 5,
+                { _id: 'PinkFloyd-TheWall', itemName: 'The Wall', artist: 'Pink Floyd', year: 1977, recordLabel: 'Harvest', catalogCategory: 'Rock', description: 'The Wall chronicles the story of Pink, a character whose life pushes him further and further into complete alienation from other people.',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'In The Flesh?', artists: ['Pink Floyd'], length: '3:16'},
                         { number: 2, title: 'The Thin Ice', artists: ['Pink Floyd'], length: '2:27' },
@@ -195,7 +250,12 @@ module.exports.resetDb = () => {
                         { number: 26, title: 'Outside the Wall', artists: ['Pink Floyd'], length: '1:41' }
                     ]
                 },
-                { _id: 'JasonAldean-RearviewTown', itemName: 'Rearview Town', artist: 'Jason Aldean', year: 2018, recordLabel: 'Sony Music CG', catalogCategory: 'Country', description: '', rating: 4,
+                { _id: 'JasonAldean-RearviewTown', itemName: 'Rearview Town', artist: 'Jason Aldean', year: 2018, recordLabel: 'Sony Music CG', catalogCategory: 'Country', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Dirt to Dust', artists: ['Jason Aldean'], length: '2:48' },
                         { number: 2, title: 'Set it Off', artists: ['Jason Aldean'], length: '2:50' },
@@ -214,7 +274,12 @@ module.exports.resetDb = () => {
                         { number: 15, title: 'High Noon Neon', artists: ['Jason Aldean'], length: '2:55' }
                     ]
                 },
-                { _id: 'DevinDawson-DarkHorse', itemName: 'Dark Horse', artist: 'Devin Dawson', year: 2018, recordLabel: 'Warner Bros. Records', catalogCategory: 'Country', description: '', rating: 3,
+                { _id: 'DevinDawson-DarkHorse', itemName: 'Dark Horse', artist: 'Devin Dawson', year: 2018, recordLabel: 'Warner Bros. Records', catalogCategory: 'Country', description: '',
+                    rating: {
+                        value: 3,
+                        actualValue: 3,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Dip', artists: ['Devin Dawson'], length: '3:23' },
                         { number: 2, title: 'All On Me', artists: ['Devin Dawson'], length: '3:45' },
@@ -230,7 +295,12 @@ module.exports.resetDb = () => {
                         { number: 12, title: 'Dark Horse', artists: ['Devin Dawson'], length: '3:32' }
                     ]
                 },
-                { _id: 'KaceyMusgraves-PageantMaterial', itemName: 'Pageant Material', artist: 'Kacey Musgraves', year: 2015, recordLabel: 'Universal Music Group Nashville', catalogCategory: 'Country', description: 'Kacey Musgraves\' Pageant Material breaks with country tradition, shining on light on some of the more unsightly aspects of southern culture.', rating: 5,
+                { _id: 'KaceyMusgraves-PageantMaterial', itemName: 'Pageant Material', artist: 'Kacey Musgraves', year: 2015, recordLabel: 'Universal Music Group Nashville', catalogCategory: 'Country', description: 'Kacey Musgraves\' Pageant Material breaks with country tradition, shining on light on some of the more unsightly aspects of southern culture.',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'High Time', artists: ['Kacey Musgraves'], length: '2:57' },
                         { number: 2, title: 'Dime Store Cowgirl', artists: ['Kacey Musgraves'], length: '3:35' },
@@ -248,7 +318,12 @@ module.exports.resetDb = () => {
                         { number: 14, title: 'Are You Sure (Hidden Track)', artists: ['Kacey Musgraves', 'Willie Nelson'], length: '3:56' }
                     ]
                 },
-                { _id: 'Eminem-Kamikaze', itemName: 'Kamikaze', artist: 'Eminem', year: 2018, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '', rating: 5,
+                { _id: 'Eminem-Kamikaze', itemName: 'Kamikaze', artist: 'Eminem', year: 2018, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'The Ringer', artists: ['Eminem'], length: '5:37' },
                         { number: 2, title: 'Greatest', artists: ['Eminem'], length: '3:46' },
@@ -265,7 +340,12 @@ module.exports.resetDb = () => {
                         { number: 13, title: 'Venom (Music from the Motion Picture)', artists: ['Eminem'], length: '4:29' }
                     ]
                 },
-                { _id: 'KendrickLamar-ToPimpAButterfly', itemName: 'To Pimp A Butterfly', artist: 'Kendrick Lamar', year: 2015, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '', rating: 5,
+                { _id: 'KendrickLamar-ToPimpAButterfly', itemName: 'To Pimp A Butterfly', artist: 'Kendrick Lamar', year: 2015, recordLabel: 'Aftermath Entertainment', catalogCategory: 'Rap', description: '',
+                    rating: {
+                        value: 5,
+                        actualValue: 5,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Wesley\'s Theory', artists: ['Kendrick Lamar', 'George Clinton', 'Thundercat'], length: '4:47' },
                         { number: 2, title: 'For Free? (Interlude)', artists: ['Kendrick Lamar'], length: '2:10' },
@@ -285,7 +365,12 @@ module.exports.resetDb = () => {
                         { number: 16, title: 'Mortal Man', artists: ['Kendrick Lamar'], length: '12:07' }
                     ]
                 },
-                { _id: 'NWA-StraightOuttaCompton', itemName: 'Straight Outta Compton', artist: 'N.W.A.', year: 1988, recordLabel: 'Ruthless Records', catalogCategory: 'Rap', description: '', rating: 4,
+                { _id: 'NWA-StraightOuttaCompton', itemName: 'Straight Outta Compton', artist: 'N.W.A.', year: 1988, recordLabel: 'Ruthless Records', catalogCategory: 'Rap', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Straight Outta Compton', artists: ['N.W.A.'], length: '4:18' },
                         { number: 2, title: 'F*ck Tha Police', artists: ['N.W.A.'], length: '5:45' },
@@ -299,7 +384,12 @@ module.exports.resetDb = () => {
                         { number: 10, title: 'Quiet on tha Set', artists: ['N.W.A.'], length: '4:00' }
                     ]
                 },
-                { _id: 'Metallica-MasterOfPuppets', itemName: 'Master of Puppets', artist: 'Metallica', year: 1986, recordLabel: 'Elektra Records', catalogCategory: 'Metal', description: '', rating: 4,
+                { _id: 'Metallica-MasterOfPuppets', itemName: 'Master of Puppets', artist: 'Metallica', year: 1986, recordLabel: 'Elektra Records', catalogCategory: 'Metal', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Battery', artists: ['Metallica'], length: '5:12' },
                         { number: 2, title: 'Master of Puppets', artists: ['Metallica'], length: '8:35' },
@@ -311,7 +401,12 @@ module.exports.resetDb = () => {
                         { number: 8, title: 'Damage, Inc.', artists: ['Metallica'], length: '5:08' }
                     ]
                 },
-                { _id: 'BlackSabbath-MasterOfReality', itemName: 'Master of Reality', artist: 'Black Sabbath', year: 1971, recordLabel: 'Vertigo Records', catalogCategory: 'Metal', description: '', rating: 3,
+                { _id: 'BlackSabbath-MasterOfReality', itemName: 'Master of Reality', artist: 'Black Sabbath', year: 1971, recordLabel: 'Vertigo Records', catalogCategory: 'Metal', description: '',
+                    rating: {
+                        value: 3,
+                        actualValue: 3,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Sweet Leaf', artists: ['Black Sabbath'], length: '5:05' },
                         { number: 2, title: 'After Forever', artists: ['Black Sabbath'], length: '5:27' },
@@ -323,7 +418,12 @@ module.exports.resetDb = () => {
                         { number: 8, title: 'Into the Void', artists: ['Black Sabbath'], length: '6:13' }
                     ]
                 },
-                { _id: 'Anthrax-FistfulOfMetal', itemName: 'Fistful of Metal', artist: 'Anthrax', year: 1984, recordLabel: 'Banzai Records', catalogCategory: 'Metal', description: '', rating: 4,
+                { _id: 'Anthrax-FistfulOfMetal', itemName: 'Fistful of Metal', artist: 'Anthrax', year: 1984, recordLabel: 'Banzai Records', catalogCategory: 'Metal', description: '',
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 1
+                    }, 
                     tracks: [
                         { number: 1, title: 'Deathrider', artists: ['Anthrax'], length: '3:10' },
                         { number: 2, title: 'Metal Thrasing Mad', artists: ['Anthrax'], length: '2:39' },
@@ -450,8 +550,9 @@ module.exports.resetDb = () => {
             })
         })
         // Handle any errors.
-        .then(undefined, (err) => {
+        .catch(err => {
             console.log("An error in db populating occured.");
+            console.err("Error: \n" + err);
         });
 }
 
@@ -474,5 +575,8 @@ module.exports.dropDb = () => {
         // Status update.
         .then(() => {
             console.log("Offer collection empited.");
+        })
+        .catch(err => {
+            console.error("Error: \n" + err);
         })
 }

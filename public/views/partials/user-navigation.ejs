@@ -2,12 +2,14 @@
     <ul>
         <% if(theUser.user == true) { %>
             <li><a href="/signout" class="button__bubble button__bubble--large">Sign Out</a></li>
+            <li><a href="/myItems" class="button__bubble button__bubble--large">My CDs</a></li>
+            <li><a href="/mySwaps" class="button__bubble button__bubble--large">My Swaps</a></li>
+            <li><a href="/profile?user=<%= theUser.id %>" class="button__bubble button__bubble--large">My Profile</a></li>
         <% } else { %>
             <li><button class="button__bubble button__bubble--large modal__sign-in--trigger">Sign In</button></li>
+            <li><span class="button__bubble--inactive button__bubble--span">More Options Available Upon Login</span></li>
         <% } %>
-        <li><a href="/myitems" class="button__bubble button__bubble--large">My CDs</a></li>
-        <li><a href="/myswaps" class="button__bubble button__bubble--large">My Swaps</a></li>
-        <li><a href="#" class="button__bubble button__bubble--large">My Profile</a></li>
+        
     </ul>
 
     <form method="post" class="search__form">
@@ -24,9 +26,12 @@
         <form method="POST" action="/signin" class="sign-in__form">
             <h2>Sign In</h2>
             <label for="username">Username</label>
-            <input type="text" name="username" value="cschulme">
+            <input type="text" name="username" value="cschulme" placeholder="Note: Case-sensitive.">
             <label for="password">Password</label>
-            <input type="password" name="password" value="password">
+            <input type="password" name="password" value="password" placeholder="Note: Case-sensitive.">
+            <% if(typeof fromError !== 'undefined' && fromError == true) { %>
+                <input type="hidden" name="cameFromError" value="true">
+            <% } %>
             <input type="submit" value="Sign In" class="button__bubble button__bubble--large">
             <div class="forgot">
                 <a href="#" class="button__bar">Forgot Username?</a>

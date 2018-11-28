@@ -27,6 +27,10 @@ $(document).ready(function() {
         $('.modal__select').addClass("modal--show");
     });
 
+    $('.modal__rate-item--trigger').click(function() {
+        $('.modal__rate-item').addClass("modal--show");
+    });
+
     $('.modal--close').click(function() {
         $('.modal').removeClass("modal--show");
     });
@@ -47,5 +51,15 @@ $(document).ready(function() {
                 .removeClass('button__bubble--inactive')
                 .addClass('button__bubble');
         }        
+    });
+
+    $('.star-rating input:radio').attr('checked', false);
+
+    $('.star-rating input').click(function() {
+        $('.star-rating span').removeClass('star-rating--checked');
+        $(this).parent().addClass('star-rating--checked');
+        $('#rate-item--submit').prop('disabled', false)
+            .removeClass('button__bubble--inactive')
+            .addClass('button__bubble');
     });
 });

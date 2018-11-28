@@ -38,7 +38,10 @@ UserSchema.virtual('fullName').get(()  => {
 });
 
 // Use mongoose-auto-increment to automatically set _id numbers.
-UserSchema.plugin(autoIncrement.plugin, 'User');
+UserSchema.plugin(autoIncrement.plugin, {
+    model: 'User',
+    startAt: 4
+});
 
 const User = db.model('User', UserSchema);
 

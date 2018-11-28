@@ -13,9 +13,20 @@ const ItemSchema = new mongoose.Schema({
     catalogCategory: String,
     description: String,
     rating: {
-        type: Number,
-        min: 1,
-        max: 5
+        value: {
+            type: Number,
+            min: 1,
+            max: 5
+        },
+        actualValue: {
+            type: Number,
+            min: 1,
+            max: 5
+        },
+        numberOfVotes: {
+            type: Number,
+            min: 1
+        }
     },
     tracks: Array
 }, {
@@ -137,7 +148,11 @@ module.exports.addItem = function(itemName, artist, year, recordLabel, catalogCa
             recordLabel: recordLabel,
             catalogCategory: catalogCategory,
             description: description,
-            rating: rating,
+            rating: {
+                value: rating,
+                actualValue: rating,
+                numberOfVotes: 1
+            },
             tracks: tracks
         });
 

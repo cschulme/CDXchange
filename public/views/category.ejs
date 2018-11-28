@@ -43,10 +43,10 @@
                                     <td><%= item.year %></td>
                                     <td>
                                         <span class="rating">
-                                            <% for(var j = 1; j <= item.rating; j++) { %>
+                                            <% for(var j = 1; j <= item.rating.value; j++) { %>
                                                 <i class="fas fa-star checked"></i>
                                             <% } %>
-                                            <% for(var j = 5; j > item.rating; j--) { %>
+                                            <% for(var j = 5; j > item.rating.value; j--) { %>
                                                 <i class="fas fa-star"></i>
                                             <% } %>
                                         </span>

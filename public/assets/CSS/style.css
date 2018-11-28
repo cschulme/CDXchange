@@ -63,7 +63,7 @@ button:hover {
 }
 
 .button__simple:hover {
-    text-decoration: underline;
+    color: rgb(2, 211, 176);
 }
 
 .button__bar {
@@ -114,6 +114,19 @@ button:hover {
     border-radius: 20px;
     background: none;
 
+    color: white;
+    font-size: 1.2rem;
+}
+
+.button__bubble--span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0px 50px;
+    height: 40px;
+    border-radius: 20px;
+    
     color: white;
     font-size: 1.2rem;
 }
@@ -208,7 +221,7 @@ button:hover {
     transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
 }
 
-.modal__select--trigger {
+.modal__select--trigger, .modal__rate-item--trigger {
     background: none;
 }
 
@@ -232,6 +245,70 @@ button:hover {
 .modal__select--table-container {
     grid-area: select-table;
     overflow: auto;
+}
+
+.modal__rate-item--content {
+    min-width: 800px;
+}
+
+.star-rating {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row-reverse;
+
+    margin: 0 auto;
+    width: 200px;
+    font-size: 30px;
+}
+
+.star-rating span {
+    position: relative;
+    float: right;
+}
+
+.star-rating span input {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 30px;
+    width: 30px;
+    opacity: 0;
+}
+
+.star-rating span input:hover {
+    cursor: pointer;
+}
+
+.star-rating span i {
+    color: grey;
+    transition: all 0s;
+}
+
+.star-rating span:hover ~ span i,
+.star-rating span:hover i,
+.star-rating span.star-rating--checked i,
+.star-rating span.star-rating--checked ~ span i {
+    color: rgb(2, 211, 176);
+    cursor: pointer;
+}
+
+.modal__rate-item form {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modal__rate-item textarea {
+    border-radius: 20px;
+    height: 200px;
+    width: 600px;
+    padding: 20px;
+    margin: 20px 0px;
+    border: none;
+    resize: none;
+    font-size: 1.2rem;
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* === TABLES === */
@@ -332,6 +409,25 @@ td {
     grid-gap: 20px;
 }
 
+.sign-in__form--error {
+    grid-template-rows: 50px 50px 50px 50px 40px 20px 120px;
+    grid-template-areas:
+        "sign-in__header sign-in__header"
+        "sign-in__subheader sign-in__subheader"
+        "label input"
+        "label input"
+        "submit submit"
+        "forgot forgot"
+        "register register";
+
+    width: 620px;
+    margin: 0 auto -50px;
+}
+
+.sign-in__form--error h3 {
+    grid-area: sign-in__subheader;
+}
+
 .sign-in__form h2 {
     grid-area: sign-in__header;
     text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
@@ -403,62 +499,105 @@ td {
 }
 
 /* --- Register Form --- */
-.form__register {
+
+.form__register h3 {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin: 20px 0px;
+    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+}
+
+.subheader {
+    font-size: 1.2rem;
+    color: rgb(177, 177, 177);
+    text-transform: uppercase;
+}
+
+.form__register--field {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 30px;
-    grid-template-areas:
-        "column1 column2"
-        "submit submit";
+    grid-template-columns: 200px 1fr;
 
-    min-height: 500px;
-}
-
-.form__register--column-1 {
-    grid-area: column1;
-}
-
-.form__register--column-2 {
-    grid-area: column2;
-}
-
-.form__register--cell {
-    display: flex;
-
-    height: 60px;
-    padding: 10px;
-}
-
-.form__register--cell label {
-    display: flex;
-    align-items: center;
-
-    width: 200px;
-    padding: 0px 15px;
+    height: 40px;
 
     font-size: 1.2rem;
+}
+
+.form__register--field label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    
+    padding-right: 20px;
+
     text-transform: uppercase;
     font-weight: bold;
 }
 
-.form__register--cell input {
-    width: calc(100% - 200px);
+.form__register--field input[type="text"],
+.form__register--field input[type="password"],
+.form__register--field input[type="email"] {
+    height: 40px;
+    padding: 10px;
+    border-radius: 20px;
     font-size: 1.2rem;
-    border-radius: 15px;
-    outline: none;
     border: none;
-    padding-left: 20px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+}
+
+.form__register--field input[type="text"]:focus:not(.input--error),
+.form__register--field input[type="password"]:focus:not(.input--error),
+.form__register--field input[type="email"]:focus:not(.input--error) {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5),
+                0px 0px 0px 5px rgb(2, 211, 176);
+    outline: none;
+}
+
+input.input--error:focus {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5),
+                0px 0px 0px 5px rgb(218, 67, 67);
+    outline: none;
+}
+
+.form__register hr {
+    border: none;
+    height: 3px;
+    width: 100%;
+    margin: 10px 0px;
+    background-color: rgb(2, 211, 176);
+    border-radius: 1.5px;
 }
 
 .form__register--submit {
-    grid-area: submit;
-
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    padding-right: 30px;
+    justify-content: center;
 }
 
+.form__register--submit input[type="submit"] {
+    padding: 0rem 10rem;
+}
+
+.registration-errors {
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: rgb(255, 126, 126);
+    border: 3px solid rgb(218, 67, 67);
+}
+
+.registration-errors__header {
+    text-transform: uppercase;
+    margin: 0px 0px 10px;
+}
+
+.registration-errors ul {
+    margin: 0px;
+}
+
+.input--error {
+    background-color: rgb(255, 129, 129);
+}
 
 /* === HEADER === */
 
@@ -735,6 +874,12 @@ main {
     text-shadow: 0px 0px 30px rgba(0, 0, 0, 0.555);
 }
 
+.subsection__header {
+    font-size: 1.75rem;
+    text-shadow: 0px 0px 30px rgba(0, 0, 0, 0.555);
+    text-transform: uppercase;
+}
+
 
 
 /* === FOOTER === */
@@ -781,6 +926,10 @@ footer a {
     border-radius: 2.5px;
     background-color: rgb(2, 211, 176);
     top: 100%;
+}
+
+.heading__no-after::after {
+    display: none !important;
 }
 
 .static p {
@@ -927,24 +1076,14 @@ footer a {
     padding: 20px;
 }
 
-.album-content__wrapper {
-    height: 100%;
-    width: 100%;
-
-    display: grid;
-    grid-template-rows: 275px 20px calc(100% - 295px);
-    grid-template-areas:
-        "album-info"
-        "."
-        "album-tracks";
-}
-
 .album-content__info {
     display: grid;
     grid-template-columns: 275px calc(100% - 275px);
-    grid-template-rows: 275px;
+    grid-template-rows: 285px;
     grid-template-areas:
         "image data";
+
+    margin-bottom: -10px;
 }
 
 .album-content__info--small {
@@ -995,6 +1134,129 @@ footer a {
     grid-area: album-tracks;
 }
 
+.album-feedback__review {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    grid-gap: 20px;
+
+    min-height: 120px;
+    border-radius: 10px;
+    padding: 20px;
+    width: auto;
+    background-color: rgb(31, 31, 31);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.album-feedback__review:last-of-type {
+    margin-bottom: 0px;
+}
+
+.album-feedback__review--image {
+    height: 100px;
+    width: 100px;
+}
+
+.album-feedback__review--info * {
+    margin: 0px;
+}
+
+.album-feedback__review--info h4 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.album-feedback__review--options {
+    float: right;
+}
+
+.album-feedback__review--options a,
+.album-feedback__review--options button {
+    background: none;
+    outline: none;
+    color: white;
+    border: none;
+    transition: none;
+    font-size: 1.2rem;
+}
+
+.album-feedback__review--options a:hover,
+.album-feedback__review--options button:hover {
+    color: rgb(2, 211, 176);
+}
+
+.album-feedback__review--info h4::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    display: block;
+    background-color: rgb(2, 211, 176);
+}
+
+.album-feedback__review--info p {
+    margin-top: 10px;
+}
+
+.paragraph-header {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* --- PROFILE --- */
+.profile-content__info {
+    display: grid;
+    grid-template-columns: 200px calc(100% - 200px);
+    grid-template-rows: 200px;
+    grid-template-areas:
+        "profileImage profileData";
+}
+
+.profile-content__info--image {
+    grid-area: profileImage;
+    height: 100%;
+    width: 100%;
+    grid-area: profileImage;
+}
+
+.profile-content__info--data {
+    grid-area: profileData;
+
+    padding: 20px;
+
+    background-color: rgb(31, 31, 31);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: auto;
+
+    font-weight: 400;
+}
+
+.profile-content__info--data-header {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.profile-content__info--data-header::after {
+    content: '';
+    width: 100%;
+    height: 5px;
+    border-radius: 2.5px;
+    background-color: rgb(2, 211, 176);
+    position: absolute;
+    top: 100%;
+    left: 0;
+}
+
+.profile-content__info--data h3 {
+    margin-bottom: 10px;
+}
+
+.profile-content__info--data p {
+    margin: 0px;
+}
+
 /* === MISC CLASSES === */
 
 .rating {
@@ -1014,6 +1276,10 @@ footer a {
     background: linear-gradient(rgb(78, 78, 78), rgb(58, 58, 58));
     box-shadow: inset 0px 0px 20px rgba(0, 0, 0, 0.342);
     color: white;
+}
+
+.content__wrapper--extended {
+    padding-bottom: 60px;
 }
 
 .icon--large {

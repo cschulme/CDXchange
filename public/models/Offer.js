@@ -185,3 +185,17 @@ module.exports.deleteOffer = function(id) {
             .catch(err => reject(err))
     })
 }
+
+/**
+ * getNumberOfOffersInvolvingAUser(userId) - Returns a count of all the offers
+ *      where the passed user is either the _userId or the _otherUserId.
+ * @param {Number} userId - The id of the user.
+ * @returns {Promise<any>}
+ */
+module.exports.getNumberOfOffersInvolvingAUser = function(userId) {
+    return new Promise((resolve, reject) => {
+        Offer.count({ $or: [{ _userId: userId }, { _otherUserId: userId }] })
+            .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    });
+}

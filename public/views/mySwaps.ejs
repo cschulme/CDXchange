@@ -20,7 +20,7 @@
                 <a href="/myswaps" class="button__bar">My Swaps</a>
             </section>
             <section class="content__shell">
-                <div class="content__wrapper">
+                <div class="content__wrapper content__wrapper--extended">
                     <h2 class="section--header">Your Swap Offers</h2>
                     <% if(typeof myOffers !== 'undefined') { %>
                         <table>
@@ -66,7 +66,7 @@
                                         <% }) %>
                                         <% myUsers.forEach(user => { %>
                                             <% if(user._id == offer._otherUserId) { %>
-                                                <td><%= user.username %></td>
+                                                <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
                                             <% } %>
                                         <% }) %>
                                         <td>Pending</td>
@@ -90,7 +90,7 @@
                                         <% }) %>
                                         <% myUsers.forEach(user => { %>
                                             <% if(user._id == offer._otherUserId) { %>
-                                                <td><%= user.username %></td>
+                                            <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
                                             <% } %>
                                         <% }) %>
                                         <td>Swapped</td>
@@ -105,7 +105,7 @@
                                         <tr>
                                             <% otherUsers.forEach(user => { %>
                                                 <% if(user._id == offer._userId) { %>
-                                                    <td><%= user.username %></td>
+                                                <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
                                                 <% } %>
                                             <% }) %>
                                             <% otherOffersItems.forEach(item => { %>
@@ -137,7 +137,7 @@
                                         <tr>
                                             <% otherUsers.forEach(user => { %>
                                                 <% if(user._id == offer._userId) { %>
-                                                    <td><%= user.username %></td>
+                                                <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
                                                 <% } %>
                                             <% }) %>
                                             <% otherOffersItems.forEach(item => { %>
@@ -160,7 +160,7 @@
                                         <tr>
                                             <% otherUsers.forEach(user => { %>
                                                 <% if(user._id == offer._userId) { %>
-                                                    <td><%= user.username %></td>
+                                                <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
                                                 <% } %>
                                             <% }) %>
                                             <% otherOffersItems.forEach(item => { %>

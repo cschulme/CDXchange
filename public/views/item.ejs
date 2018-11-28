@@ -22,17 +22,22 @@
                 <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bar"><%= item.itemName %></a>
             </section>
             <section id="album-content">
-                <div class="content__wrapper album-content__wrapper">
+                <div class="content__wrapper">
                     <div class="album-content__info">
                         <img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="album-content__info--image">
                         <div class="album-content__info--data">
                             <div class="album-content__info--data-header">
                                 <h2><%= item.itemName %></h2>
                                 <span class="rating">
-                                    <% for(let j = 1; j <= item.rating; j++) { %>
+                                    <% if(item.rating.numberOfVotes > 1) { %>
+                                        (<%= item.rating.numberOfVotes %> Votes) 
+                                    <% } else { %>
+                                    (<%= item.rating.numberOfVotes %> Vote) 
+                                    <% } %>
+                                    <% for(let j = 1; j <= item.rating.value; j++) { %>
                                         <i class="fas fa-star checked"></i>
                                     <% } %>
-                                    <% for(let j = 5; j > item.rating; j--) { %>
+                                    <% for(let j = 5; j > item.rating.value; j--) { %>
                                         <i class="fas fa-star"></i>
                                     <% } %>
                                 </span>
@@ -52,14 +57,21 @@
                                 <% } else { %>
                                     <span class="button__bubble--medium button__bubble--inactive">You own this item</span>
                                 <% } %>
-                                <a href="/categories/<%= item.catalogCategory %>/<%= item.itemCode %>" class="button__bubble button__bubble--medium">Rate It</a>
+                                <% if(reviewed == false) { %>
+                                    <button class="button__bubble button__bubble--medium modal__rate-item--trigger">Rate It</button>
+                                <% } else { %>
+                                    <span class="button__bubble--inactive button__bubble--medium">You've already rated this item</span>
+                                <% } %>
                             <% } else { %>
                                 <span class="button__bubble--medium button__bubble--inactive">Please login to swap or rate</span>
                             <% } %>
                         </div>
                     </div>
+                    <br>
                     <div class="album-content__tracks">
                         <% if(item.tracks.length != 0) { %>
+                            <h3 class="subsection__header">Tracks</h3>
+                            
                             <table>
                                 <tr>
                                     <th>#</th>
@@ -88,6 +100,47 @@
                             <h3>No track information available at this time.</h3>
                         <% } %>  
                     </div>
+                    <% if(typeof feedback !== 'undefined' && feedback.length > 0) { %>
+                        <br>
+                        <div class="album-feedback">
+                            <h3 class="subsection__header">Reviews (<%= feedback.length %>)</h3>
+                            <br>
+                            <% feedback.forEach(review => { %>
+                                <div class="album-feedback__review">
+                                    <img src="/Images/ProfileImages/DefaultProfileImage.jpg" class="album-feedback__review--image">
+                                    <div class="album-feedback__review--info">
+                                        <% for(var i = 0; i < feedbackUsers.length; i++) { %>
+                                            <% if(feedbackUsers[i]._id == review._userId) { %>
+                                                <h4>
+                                                    <%= feedbackUsers[i].username %>
+                                                    <% if(feedbackUsers[i]._id == theUser.id ) { %>
+                                                        (You)
+                                                        <span class="album-feedback__review--options">
+                                                            <a href="/rateItem?action=edit&theReview=<%= review._id %>"><i class="fas fa-edit"></i></a>
+                                                            <button onclick="deleteReviewPrompt('<%= review._id %>')"><i class="fas fa-trash-alt"></i></button>
+                                                        </span>
+                                                    <% } %>
+                                                </h4>
+                                                <% break; %>
+                                            <% } %>
+                                        <% } %>
+                                        <span class="rating">
+                                            <% for(let j = 1; j <= review.starRating; j++) { %>
+                                                <i class="fas fa-star checked"></i>
+                                            <% } %>
+                                            <% for(let j = 5; j > review.starRating; j--) { %>
+                                                <i class="fas fa-star"></i>
+                                            <% } %>
+                                        </span>
+                                        <p><span class="paragraph-header">Posted: </span><%= review.postedOn.getMonth() + 1 %>-<%= review.postedOn.getDate() %>-<%= review.postedOn.getFullYear() %></p>
+                                        <% if(review.comment != '') { %>
+                                            <p><span class="paragraph-header">Comment: </span><%= review.comment %></p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
                 </div>
             </section>
 
@@ -127,5 +180,41 @@
                 </div>
             </div>
         <% } %>
+
+        <!-- RATING MODAL -->
+        <% if(theUser.user == true) { %>
+            <div class="modal modal__rate-item">
+                <div class="modal--content modal__rate-item--content">
+                    <div class="modal__select--header">
+                        <span class="modal--close">&times;</span>
+                        <h2>Rate "<%= item.itemName %>"</h2>
+                    </div>
+                    <br>
+                    <div class="modal__rate-item--feedback-container">
+                        <form method="POST" action="/rateItem">
+                            <input type="hidden" name="userId" value="<%= theUser.id %>">
+                            <input type="hidden" name="itemId" value="<%= item._id %>">
+                            <div class="star-rating">
+                                <span><input type="radio" name="rating" id="star5" value="5"><i class="fas fa-star"></i></span>
+                                <span><input type="radio" name="rating" id="star4" value="4"><i class="fas fa-star"></i></span>
+                                <span><input type="radio" name="rating" id="star3" value="3"><i class="fas fa-star"></i></span>
+                                <span><input type="radio" name="rating" id="star2" value="2"><i class="fas fa-star"></i></span>
+                                <span><input type="radio" name="rating" id="star1" value="1"><i class="fas fa-star"></i></span>
+                            </div>
+                            <textarea name="comment" placeholder="Any comments on <%= item.itemName %>?"></textarea>
+                            <input type="submit" value="Rate" class="button__bubble--inactive button__bubble--large" id="rate-item--submit" disabled>
+                        </form>
+                    </div> 
+                </div>
+            </div>
+        <% } %>
+
+        <script>
+            function deleteReviewPrompt(reviewId) {
+                if(confirm("Are you sure you want to delete this review?")) {
+                    window.location = '/rateItem?action=delete&theReview=' + reviewId;
+                }
+            }
+        </script>
     </body>
 </html>
