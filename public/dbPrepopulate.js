@@ -5,6 +5,7 @@ const ItemModel = require('./models/Item');
 const UserModel = require('./models/User');
 const OfferModel = require('./models/Offer');
 const ItemFeedbackModel = require('./models/ItemFeedback');
+const OfferFeedbackModel = require('./models/OfferFeedback');
 
 /*
  * Resets and populates the database.
@@ -24,11 +25,25 @@ module.exports.resetDb = () => {
         })
         // Status update.
         .then(() => {
-            console.log("Offer collection empited.");
+            console.log("Offer collection emptied.");
             ItemFeedbackModel.ItemFeedback.deleteMany({}).exec();
         })
         .then(() => {
             console.log("Item Feedback collection emptied.");
+            OfferFeedbackModel.OfferFeedback.deleteMany({}).exec();
+        })
+        .then(() => {
+            console.log("Offer Feedback collection emptied.");
+            mongoose.connection.db.collection('identitycounters', (error, collection) => {
+                if(!error) {
+                    collection.deleteMany({})
+                } else {
+                    console.error(error);
+                }
+            })
+        })
+        .then(() => {
+            console.log("Identity Country collection emptied.");
             console.log("Beginning database population...");
         })
         // Populate items collection.
@@ -469,7 +484,12 @@ module.exports.resetDb = () => {
                         'TaylorSwift-1989',
                         'TroyeSivan-Bloom',
                         'WalkTheMoon-TalkingIsHard'
-                    ]
+                    ],
+                    rating: {
+                        value: 4,
+                        actualValue: 4,
+                        numberOfVotes: 3
+                    }
                 }, { 
                     _id: 2, 
                     firstName: 'Chase', 
@@ -493,7 +513,12 @@ module.exports.resetDb = () => {
                         'PinkFloyd-DarkSideOfTheMoon',
                         'KendrickLamar-ToPimpAButterfly',
                         'Nirvana-InUtero'
-                    ]
+                    ],
+                    rating: {
+                        value: 0,
+                        actualValue: 0,
+                        numberOfVotes: 0
+                    }
                 }, { 
                     _id: 3, 
                     firstName: 'Katelyn', 
@@ -517,7 +542,12 @@ module.exports.resetDb = () => {
                         'BlackSabbath-MasterOfReality',
                         'Eminem-Kamikaze',
                         'Anthrax-FistfulOfMetal'
-                    ]
+                    ],
+                    rating: {
+                        value: 0,
+                        actualValue: 0,
+                        numberOfVotes: 0
+                    }
                 }
             ];
 
@@ -531,16 +561,32 @@ module.exports.resetDb = () => {
                 {
                     _id: 1,
                     _userId: 2,
+                    userRated: {
+                        status: false,
+                        _feedbackId: undefined
+                    },
                     _ownedItemId: 'KendrickLamar-ToPimpAButterfly',
                     _wantedItemId: 'TaylorSwift-1989',
                     _otherUserId: undefined,
+                    otherUserRated: {
+                        status: false,
+                        _feedbackId: undefined
+                    },
                     status: 'Available'
                 }, {
                     _id: 2,
                     _userId: 1,
+                    userRated: {
+                        status: false,
+                        _feedbackId: undefined
+                    },
                     _ownedItemId: 'TroyeSivan-Bloom',
                     _wantedItemId: 'Eminem-Kamikaze',
                     _otherUserId: 3,
+                    otherUserRated: {
+                        status: false,
+                        _feedbackId: undefined
+                    },
                     status: 'Pending'
                 }
             ];
@@ -552,31 +598,6 @@ module.exports.resetDb = () => {
         // Handle any errors.
         .catch(err => {
             console.log("An error in db populating occured.");
-            console.err("Error: \n" + err);
-        });
-}
-
-/*
- * Drops the database.
- */
-module.exports.dropDb = () => {
-    // Clear items collection.
-    ItemModel.Items.deleteMany({})
-        // Clear users collection.
-        .then(() => {
-            console.log("Item collection emptied.");
-            UserModel.Users.deleteMany({});
-        })
-        // Clear swaps collection.
-        .then(() => {
-            console.log("User collection emptied.");
-            OfferModel.Offers.deleteMany({});
-        })
-        // Status update.
-        .then(() => {
-            console.log("Offer collection empited.");
-        })
-        .catch(err => {
             console.error("Error: \n" + err);
-        })
+        });
 }

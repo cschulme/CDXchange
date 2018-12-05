@@ -38,7 +38,7 @@
                                         <td><input type="radio" name="ownedItem" value="<%= item._id %>" class="form__radio-button ownedItemRadio"></td>
                                         <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
                                         <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
-                                        <td><%= item.artist %></td>
+                                        <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
                                         <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
                                         <td>
                                             <span class="rating">
@@ -68,7 +68,7 @@
                                         <td><input type="radio" name="wantedItem" value="<%= item._id %>" class="form__radio-button wantedItemRadio"></td>
                                         <td><img src="/Images/AlbumCovers/<%= item._id %>.jpg" alt="<%= item.itemName %> Album Cover" class="image-icon"></td>
                                         <td><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__bar button__bar--small"><%= item.itemName %></a></td>
-                                        <td><%= item.artist %></td>
+                                        <td><a href="/artists" class="button__bar button__bar--small"><%= item.artist %></a></td>
                                         <td><a href="/categories/<%= item.catalogCategory %>" class="button__bar button__bar--small"><%= item.catalogCategory %></a></td>
                                         <td>
                                             <span class="rating">

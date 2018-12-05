@@ -5,12 +5,27 @@ const mongoose = require('mongoose');
 // --- MODEL ---
 const ItemSchema = new mongoose.Schema({
     // ItemCode.
-    _id: String,
-    itemName: String,
-    artist: String,
-    year: Number,
+    _id: {
+        type: String,
+        required: true
+    },
+    itemName: {
+        type: String,
+        required: true
+    },
+    artist: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: Number,
+        required: true
+    },
     recordLabel: String,
-    catalogCategory: String,
+    catalogCategory: {
+        type: String,
+        required: true
+    },
     description: String,
     rating: {
         value: {

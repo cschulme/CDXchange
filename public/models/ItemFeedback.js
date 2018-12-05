@@ -17,7 +17,9 @@ const ItemFeedbackSchema = new mongoose.Schema({
     },
     starRating: {
         required: true,
-        type: Number
+        type: Number,
+        min: 1,
+        max: 5
     },
     comment: String,
     postedOn: Date
@@ -31,11 +33,11 @@ const ItemFeedbackSchema = new mongoose.Schema({
 });
 
 // Use mongoose-auto-increment to automatically set _id numbers.
-ItemFeedbackSchema.plugin(autoIncrement.plugin, 'Offer');
+ItemFeedbackSchema.plugin(autoIncrement.plugin, 'ItemFeedback');
 
 const ItemFeedback = db.model('ItemFeedback', ItemFeedbackSchema);
 
-// --- FUNCTIONS ---
+// --- MODULE EXPORTS ---
 
 module.exports.ItemFeedback = ItemFeedback;
 
@@ -183,8 +185,61 @@ module.exports.deleteReview = function(reviewId, userId) {
  */
 module.exports.getNumberOfReviewsByUser = function(userId) {
     return new Promise((resolve, reject) => {
-        ItemFeedback.count({ _userId: userId })
+        ItemFeedback.countDocuments({ _userId: userId })
             .then(count => resolve(count))
+            .catch(err => reject(err))
+    });
+}
+
+module.exports.editFeedback = function(itemId, userId, rating, comment, oldRating) {
+    return new Promise((resolve, reject) => {
+        let update = {
+            starRating: rating,
+            comment: comment
+        };
+
+        let results = new Array();
+
+        ItemFeedback.findOne({ _itemId: itemId, _userId: userId })
+            .then(review => {
+                results.push(review)
+                return results;
+            })
+            .then(results => {
+                return ItemModel.getItem(itemId)
+                    .then(item => {
+                        results.push(item);
+                        return results;
+                    })
+            })
+            .then(results => {
+                let oldActualValue = results[1].rating.actualValue;
+
+                let numberOfVotes = results[1].rating.numberOfVotes;
+                let newActualValue = (((oldActualValue * numberOfVotes) - oldRating) + parseInt(rating)) / numberOfVotes;
+                let newValue = Math.round(newActualValue);
+
+                let itemUpdate = {
+                    rating: {
+                        value: newValue,
+                        actualValue: newActualValue,
+                        numberOfVotes: numberOfVotes
+                    }
+                };
+
+                results.push(itemUpdate);
+                return results;
+            })
+            .then(results => {
+                return ItemModel.updateItem(itemId, results[2])
+                    .then(() => {
+                        return results;
+                    })
+            })
+            .then(results => {
+                ItemFeedback.findOneAndUpdate({ _id: results[0]._id }, update, { new: true })
+                    .then(review => resolve(review))
+            })
             .catch(err => reject(err))
     });
 }

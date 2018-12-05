@@ -90,11 +90,15 @@
                                         <% }) %>
                                         <% myUsers.forEach(user => { %>
                                             <% if(user._id == offer._otherUserId) { %>
-                                            <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
+                                                <td><a href="/profile?user=<%= user._id %>" class="button__bar button__bar--small"><%= user.username %></a></td>
+                                                <td>Swapped</td>
+                                                <% if(offer.userRated.status == false) { %>
+                                                    <td><button onclick="rateUser('<%= offer._id %>', '<%= user.username %>', '<%= user._id %>')" class="button__bubble button__bubble--small">Rate User</button></td>
+                                                <% } else { %>
+                                                    <td><span class="button__bubble--small button__bubble--inactive">Rating Given</span></td>
+                                                <% } %>
                                             <% } %>
                                         <% }) %>
-                                        <td>Swapped</td>
-                                        <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
                                     </tr>
                                 <% } %>
                             <% }); %>
@@ -175,7 +179,16 @@
                                             <% }) %>
                                             <td>You</td>
                                             <td>Swapped</td>
-                                            <td><span class="button__bubble--small button__bubble--inactive">No Options</span></td>
+                                            <% if(offer.otherUserRated.status == false) { %>
+                                                <% for(var i = 0; i < otherUsers.length; i++) { %>
+                                                    <% if(otherUsers[i]._id == offer._userId) { %>
+                                                        <td><button onclick="rateUser('<%= offer._id %>', '<%= otherUsers[i].username %>', '<%= otherUsers[i]._id %>')" class="button__bubble button__bubble--small">Rate User</button></td>
+                                                        <% break; %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } else { %>
+                                                <td><span class="button__bubble--small button__bubble--inactive">Rating Given</span></td>
+                                            <% } %>
                                         </tr>
                                     <% } %>
                                 <% }); %>
@@ -195,5 +208,30 @@
         </main>
     
         <%- include partials/footer.ejs %>
+
+        <div class="modal modal__rate">
+            <div class="modal--content modal__rate--content">
+                <div class="modal__select--header">
+                    <span class="modal--close">&times;</span>
+                    <h2>PH</h2>
+                </div>
+                <br>
+                <div class="modal__rate--feedback-container">
+                    <form method="POST" action="/rateOffer">
+                        <input id="userId" type="hidden" name="userId">
+                        <input id="offerId" type="hidden" name="offerId">
+                        <div class="star-rating">
+                            <span><input type="radio" name="rating" id="star5" value="5"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star4" value="4"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star3" value="3"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star2" value="2"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star1" value="1"><i class="fas fa-star"></i></span>
+                        </div>
+                        <textarea id="rateTextArea" name="comment"></textarea>
+                        <input type="submit" value="Rate" class="button__bubble--inactive button__bubble--large" id="rate-item--submit" disabled>
+                    </form>
+                </div> 
+            </div>
+        </div>
     </body>
 </html>

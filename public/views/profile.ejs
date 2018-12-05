@@ -26,46 +26,32 @@
                         <div class="profile-content__info--data">
                             <div class="profile-content__info--data-header">
                                 <h2><%= user.username %></h2>
+                                <% if (user.rating.numberOfVotes == 0) { %>
+                                    <span>No ratings yet</span>
+                                <% } else { %>
+                                    <span class="rating">
+                                        <% if(user.rating.numberOfVotes > 1) { %>
+                                            (<%= user.rating.numberOfVotes %> Votes) 
+                                        <% } else { %>
+                                            (1 Vote)
+                                        <% } %>
+                                        <% for(let j = 1; j <= user.rating.value; j++) { %>
+                                            <i class="fas fa-star checked"></i>
+                                        <% } %>
+                                        <% for(let j = 5; j > user.rating.value; j--) { %>
+                                            <i class="fas fa-star"></i>
+                                        <% } %>
+                                    </span>
+                                <% } %>
                             </div>
                             <h3><%= user.address.city %>, <%= user.address.area %>, <%= user.address.country %></h3>
                             <p>
                                 <span class="paragraph-header">Items: </span><%= userItems.length %><br>
-                                <span class="paragraph-header">Item Reviews: </span><%= reviewCount %><br>
+                                <span class="paragraph-header">Item Reviews Given: </span><%= reviewCount %><br>
                                 <span class="paragraph-header">Active Swaps: </span><%= swapCount %>
                             </p>
                         </div>
                     </div>
-
-                    <% if(recentFeedback.length > 0) { %>
-                        <br>
-                        <div class="album-feedback">
-                            <h3 class="subsection__header">Most Recent Reviews:</h3>
-                            <% recentFeedback.forEach(review => { %>
-                                <% recentFeedbackItems.forEach(item => { %>
-                                    <% if(review._itemId == item._id) { %>
-                                        <div class="album-feedback__review">
-                                            <img src="/Images/AlbumCovers/<%= item._id %>.jpg" class="album-feedback__review--image">
-                                            <div class="album-feedback__review--info">
-                                                <h4><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__simple"><%= item.artist %> - <%= item.itemName %></a></h4>
-                                                <span class="rating">
-                                                    <% for(let j = 1; j <= review.starRating; j++) { %>
-                                                        <i class="fas fa-star checked"></i>
-                                                    <% } %>
-                                                    <% for(let j = 5; j > review.starRating; j--) { %>
-                                                        <i class="fas fa-star"></i>
-                                                    <% } %>
-                                                </span>
-                                                <p><span class="paragraph-header">Posted: </span><%= review.postedOn.getMonth() + 1 %>-<%= review.postedOn.getDate() %>-<%= review.postedOn.getFullYear() %></p>
-                                                <% if(review.comment != '') { %>
-                                                    <p><span class="paragraph-header">Comment: </span><%= review.comment %></p>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    <% } %>
-                                <% }); %>
-                            <% }); %> 
-                        </div>
-                    <% } %>
 
                     <% if(userItems.length > 0) { %>
                         <br>
@@ -89,10 +75,107 @@
                             </table>
                         </div>
                     <% } %>
+
+                    <% if(reviewsOfUser.length > 0) { %>
+                        <br>
+                        <div class="reviews-of-user">
+                            <h3 class="subsection__header">Latest Reviews of <%= user.username %></h3>
+                            <% reviewsOfUser.forEach(review => { %>
+                                <% usersWhoGaveReviews.forEach(reviewUser => { %>
+                                    <% if(reviewUser._id == review._userId ) { %>
+                                        <div class="feedback__review">
+                                            <a href="/profile?user=<%= reviewUser._id %>"><img src="/Images/ProfileImages/DefaultProfileImage.jpg" class="feedback__review--image"></a>
+                                            <div class="feedback__review--info">
+                                                <h4>
+                                                    <a href="/profile?user=<%= reviewUser._id %>" class="button__simple"><%= reviewUser.username %></a>
+                                                    <% if(reviewUser._id == theUser.id ) { %>
+                                                        (You)
+                                                        <span class="feedback__review--options">
+                                                            <button onclick="editUserReview('<%= review._offerId %>', '<%= user.username %>', '<%= user._id %>', '<%= review.comment %>', '<%= review.starRating %>')"><i class="fas fa-edit"></i></button>
+                                                            <button onclick="deleteUserReviewPrompt('<%= review._id %>')"><i class="fas fa-trash-alt"></i></button>
+                                                        </span>
+                                                    <% } %>
+                                                </h4>
+                                                <span class="rating">
+                                                    <% for(let j = 1; j <= review.starRating; j++) { %>
+                                                        <i class="fas fa-star checked"></i>
+                                                    <% } %>
+                                                    <% for(let j = 5; j > review.starRating; j--) { %>
+                                                        <i class="fas fa-star"></i>
+                                                    <% } %>
+                                                </span>
+                                                <p><span class="paragraph-header">Posted: </span><%= review.postedOn.getMonth() + 1 %>-<%= review.postedOn.getDate() %>-<%= review.postedOn.getFullYear() %></p>
+                                                <% if(review.comment != '') { %>
+                                                    <p><span class="paragraph-header">Comment: </span><%= review.comment %></p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            <% }); %>
+                        </div>
+                    <% } %>
+
+                    <% if(recentFeedback.length > 0) { %>
+                        <br>
+                        <div class="album-feedback">
+                            <h3 class="subsection__header">Most Recent Reviews:</h3>
+                            <% recentFeedback.forEach(review => { %>
+                                <% recentFeedbackItems.forEach(item => { %>
+                                    <% if(review._itemId == item._id) { %>
+                                        <div class="feedback__review">
+                                        <a href="/categories/<%= item.catalogCategory %>/<%= item._id %>"><img src="/Images/AlbumCovers/<%= item._id %>.jpg" class="feedback__review--image"></a>
+                                            <div class="feedback__review--info">
+                                                <h4><a href="/categories/<%= item.catalogCategory %>/<%= item._id %>" class="button__simple"><%= item.artist %> - <%= item.itemName %></a></h4>
+                                                <span class="rating">
+                                                    <% for(let j = 1; j <= review.starRating; j++) { %>
+                                                        <i class="fas fa-star checked"></i>
+                                                    <% } %>
+                                                    <% for(let j = 5; j > review.starRating; j--) { %>
+                                                        <i class="fas fa-star"></i>
+                                                    <% } %>
+                                                </span>
+                                                <p><span class="paragraph-header">Posted: </span><%= review.postedOn.getMonth() + 1 %>-<%= review.postedOn.getDate() %>-<%= review.postedOn.getFullYear() %></p>
+                                                <% if(review.comment != '') { %>
+                                                    <p><span class="paragraph-header">Comment: </span><%= review.comment %></p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            <% }); %> 
+                        </div>
+                    <% } %>
                 </div>
             </section>
         </main>
 
         <%- include partials/footer.ejs %>
+
+        <div class="modal modal__rate">
+            <div class="modal--content modal__rate--content">
+                <div class="modal__select--header">
+                    <span class="modal--close">&times;</span>
+                    <h2>PH</h2>
+                </div>
+                <br>
+                <div class="modal__rate--feedback-container">
+                    <form method="POST" action="/editOfferFeedback">
+                        <input id="userId" type="hidden" name="userId">
+                        <input id="offerId" type="hidden" name="offerId">
+                        <input id="oldRating" type="hidden" name="oldRating">
+                        <div class="star-rating">
+                            <span><input type="radio" name="rating" id="star5" value="5"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star4" value="4"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star3" value="3"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star2" value="2"><i class="fas fa-star"></i></span>
+                            <span><input type="radio" name="rating" id="star1" value="1"><i class="fas fa-star"></i></span>
+                        </div>
+                        <textarea id="rate-text-area" name="comment"></textarea>
+                        <input type="submit" value="Rate" class="button__bubble--inactive button__bubble--large" id="rate-item--submit" disabled>
+                    </form>
+                </div> 
+            </div>
+        </div>
     </body>
 </html>

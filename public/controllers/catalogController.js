@@ -16,10 +16,13 @@ app.get('/categories', (req, res) => {
     res.render('categories', { title: "CDXchange | Categories" });
 });
 
+// Handles the view for a category.
 app.get('/categories/:category', (req, res) => {
+    // Format the passed category parameter.
     var category = utilityFunctions.toTitleCase(req.params.category);
 
     if(utilityFunctions.validateCategory(category) && req.session.theUser) {
+        // Filter the items displayed to not show items that are already owned by the user.
         ItemModel.getItemsNotOwnedByCategory(req.session.theUser.userItems, category)
             .then(itemsNotOwned => res.render('category', { title: "CDXchange | " + category, category: category, items: itemsNotOwned}))
             .catch(err => {
@@ -27,6 +30,7 @@ app.get('/categories/:category', (req, res) => {
                 res.redirect('/404');
             })
     } else if(utilityFunctions.validateCategory(category)) {
+        // Get all items in the category.
         ItemModel.getItemsByCategory(category)
             .then(items => res.render('category', { title: "CDXchange | " + category, category: category, items: items}))
             .catch(err => {
@@ -39,6 +43,7 @@ app.get('/categories/:category', (req, res) => {
     }
 });
 
+// Handles the view for an item.
 app.get('/categories/:category/:item', (req, res) => {
     var category = utilityFunctions.toTitleCase(req.params.category);
 
@@ -51,6 +56,7 @@ app.get('/categories/:category/:item', (req, res) => {
     }
 });
 
+// Creates an ItemFeedback document from the passed data and redirects to the item being rated.
 app.post('/rateItem', urlencodedParser, [
     check('userId')
         .exists().withMessage('UserId must exist.')
@@ -82,20 +88,51 @@ app.post('/rateItem', urlencodedParser, [
         })
 });
 
+// Handles the logic for deleting an item rating (and potential other options in the future).
 app.get('/rateItem', (req, res) => {
-    if(req.session.theUser && req.query.action && req.query.theReview) {
-        switch(req.query.action) {
-            case 'delete': 
-                return deleteReview(req, res, req.query.theReview);
-            case 'update':
-                break;
-            default:
-                res.redirect('/404');
-        }
+    if(req.session.theUser && req.query.action == 'delete' && req.query.theReview) {
+        return deleteReview(req, res, req.query.theReview);
     } else {
         res.redirect('/404');
     }
 })
+
+// Updates an ItemFeedback document with the passed data.
+app.post('/editItemFeedback', urlencodedParser, [
+    check('userId')
+        .exists().withMessage('UserId must exist.')
+        .isInt().withMessage('UserId must be an integer.'),
+    check('itemId')
+        .exists().withMessage('ItemId must exist.')
+        .isString().withMessage('ItemId must be a string.'),
+    check('rating')
+        .exists().withMessage('Rating must exist.')
+        .isInt({ gt: 0, lt: 6 }).withMessage('Must be an integer from 1-5.'),
+    check('oldRating')
+        .exists().withMessage('OldRating must exist.')
+        .isInt({ gt: 0, lt: 6 }).withMessage('Must be an integer from 1-5.')
+], (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        return res.status(422).render('422', { title: "CDXchange | 422: Unprocessable Entity", errors: errors.array() });
+    }
+
+    ItemFeedbackModel.editFeedback(req.body.itemId, req.body.userId, req.body.rating, req.body.comment, req.body.oldRating)
+        .then(review => {
+            return ItemModel.getItem(review._itemId)
+                .then(item => {
+                    return item;
+                })
+        })
+        .then(item => {
+            res.redirect('/passBack?view=item&category=' + item.catalogCategory + '&item=' + item._id);
+        })
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+});
 
 // --- FUNCTIONS ---
 
@@ -145,7 +182,27 @@ function viewItemAsUser(req, res, itemId) {
         .then(results => {
             return OfferModel.getAvailableOffersForItem(req.session.theUser._id, itemId)
                 .then(docs => {
-                    results.push(docs)
+                    let relevantOffers = new Array();
+
+                    docs.forEach(offer => {
+                        var wantedItemIsOwned = false;
+
+                        req.session.theUser.userItems.forEach(userItem => {
+                            if(offer._wantedItemId == userItem) {
+                                wantedItemIsOwned = true;
+                            }
+                        });
+
+                        if(wantedItemIsOwned == false) {
+                            offer.wantedItemIsOwned = false;
+                            relevantOffers.push(offer);
+                        } else {
+                            offer.wantedItemIsOwned = true;
+                            relevantOffers.push(offer);
+                        }
+                    });
+
+                    results.push(relevantOffers);
                     return results;
                 })
         }) 
@@ -185,7 +242,14 @@ function viewItemAsUser(req, res, itemId) {
                     return results;
                 })
         })
-        .then(results => res.render('item', { title: "CDXchange | " + results[0].itemName, item: results[0], owned: results[1], swaps: results[2], swapUsers: results[3], reviewed: results[5], feedback: results[4], feedbackUsers: results[6] }))
+        .then(results => res.render('item', { title: "CDXchange | " + results[0].itemName, 
+                                              item: results[0], 
+                                              owned: results[1], 
+                                              swaps: results[2], 
+                                              swapUsers: results[3], 
+                                              reviewed: results[5], 
+                                              feedback: results[4], 
+                                              feedbackUsers: results[6] }))
         .catch(err => {
             console.error(err);
             res.redirect('/404');
@@ -221,7 +285,14 @@ function viewItemAsPublic(req, res, itemId) {
                     return results;
                 })
         })
-        .then(results => res.render('item', { title: "CDXchange | " + results[0].itemName, item: results[0], owned: false, swaps: undefined, swapUsers: undefined, reviewed: false, feedback: results[1], feedbackUsers: results[2] }))
+        .then(results => res.render('item', { title: "CDXchange | " + results[0].itemName, 
+                                              item: results[0], 
+                                              owned: false, 
+                                              swaps: undefined, 
+                                              swapUsers: undefined, 
+                                              reviewed: false, 
+                                              feedback: results[1], 
+                                              eedbackUsers: results[2] }))
         .catch(err => {
             console.error(err);
             res.redirect('/404');

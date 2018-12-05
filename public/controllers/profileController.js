@@ -8,12 +8,15 @@ const ItemModel = require('../models/Item');
 const UserModel = require('../models/User');
 const OfferModel = require('../models/Offer');
 const ItemFeedbackModel = require('../models/ItemFeedback');
+const OfferFeedbackModel = require('../models/OfferFeedback');
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // --- ROUTES ---
 
-// Log in.
+// --- ROUTES: LOGIN / REGISTRATION ---
+
+// Signing in.
 app.post('/signin', urlencodedParser, [
     check('username')
         .exists()
@@ -48,7 +51,7 @@ app.post('/signin', urlencodedParser, [
         });
 });
 
-// Sign out.
+// Signing out.
 app.get('/signout', (req, res) => {
     if(req.session.theUser) {
         req.session.theUser = undefined;
@@ -56,10 +59,12 @@ app.get('/signout', (req, res) => {
     res.redirect('/');
 });
 
+// Registration form.
 app.get('/register', (req, res) => {
     res.render('register', { title: "CDXchange | My CDs", errors: undefined });
 });
 
+// Submitted registration form.
 app.post('/register', urlencodedParser, [
     check('username')
         .custom(value => {
@@ -69,6 +74,8 @@ app.post('/register', urlencodedParser, [
                 return false;
             }
         }).withMessage("Username: 'Username' was left blank.")
+        .isLength({ min: 3, max: 30 }).withMessage("Username: Username must be between 3 and 30 characters long.")
+        .matches(/^[a-zA-Z0-9]{3,30}$/).withMessage("Username: Username can only contain alphanumeric characters (A-Z, a-z, 0-9).")
         .custom(value => {
             return UserModel.getUserByUsername(value)
                 .then(user => {
@@ -221,6 +228,9 @@ app.post('/register', urlencodedParser, [
     }    
 });
 
+// --- ROUTES: USER PROFILE ---
+
+// Viewing a user's profile.
 app.get('/profile', (req, res) => {
     if(req.query.user) {
         return viewProfile(req, res, req.query.user);
@@ -229,6 +239,9 @@ app.get('/profile', (req, res) => {
     }
 });
 
+// --- ROUTES: USER ITEMS ---
+
+// Viewing/updating/deleting your items.
 app.get('/myitems', function(req, res) {
     if(req.session.theUser && req.query.action && req.query.theItem) {
         if(req.query.action == 'update') {
@@ -245,6 +258,25 @@ app.get('/myitems', function(req, res) {
     }
 })
 
+// Adding an item to your items.
+app.get('/addItem', (req, res) => {
+    if(req.session.theUser && req.query.item) {
+        ItemModel.doesItemExist(req.query.item)
+            .then(() => UserModel.addUserItemById(req.session.theUser._id, req.query.item))
+            .then(user => req.session.theUser = user)
+            .then(() => res.redirect('/myitems'))
+            .catch(err => {
+                console.error(err);
+                res.redirect('/404');
+            });
+    } else {
+        res.redirect('/404');
+    }
+});
+
+// --- ROUTES: USER SWAPS ---
+
+// Viewing/handling your swaps.
 app.get('/myswaps', (req, res) => {
     if(req.session.theUser && req.query.action && req.query.theOffer) {
         if(req.query.action == 'offer') {
@@ -268,77 +300,17 @@ app.get('/myswaps', (req, res) => {
     }
 });
 
-app.get('/addItem', (req, res) => {
-    if(req.session.theUser && req.query.item) {
-        ItemModel.doesItemExist(req.query.item)
-            .then(() => UserModel.addUserItemById(req.session.theUser._id, req.query.item))
-            .then(user => req.session.theUser = user)
-            .then(() => res.redirect('/myitems'))
-            .catch(err => {
-                console.error(err);
-                res.redirect('/404');
-            });
-    } else {
-        res.redirect('/404');
-    }
-});
-
+// Form for creating a swap offer.
 app.get('/mySwaps/createSwap', (req, res) => {
     if(req.session.theUser) {
-        let results = new Array();
-
-        ItemModel.getItems(req.session.theUser.userItems)
-            .then(myItems => {
-                results.push(myItems);
-                return results;
-            })
-            .then(results => {
-                return OfferModel.getOffersByUserId(req.session.theUser._id)
-                    .then(offers => {
-                        results.push(offers);
-                        return results;
-                    })
-            })
-            .then(results => {
-                let swappableItems = new Array();
-
-                results[0].forEach(item => {
-                    let involvedInSwap = false;
-
-                    results[1].forEach(offer => {
-                        if(offer._ownedItemId == item._id && offer.status != 'Swapped') {
-                            involvedInSwap = true;
-                        }
-                    });
-
-                    if(involvedInSwap == false) {
-                        swappableItems.push(item);
-                    }
-                })
-
-                results.push(swappableItems);
-                return results;
-            })
-            .then(results => {
-                return ItemModel.getItemsNotInArray(req.session.theUser.userItems)
-                    .then(items => {
-                        results.push(items);
-                        return results;
-                    })
-            })
-            .then(results => {
-                res.render('createSwap', { title: 'CDXchange | Create Swap', myItems: results[2], otherItems: results[3], userItems: results[0] });
-            })
-            .catch(err => {
-                console.error(err);
-                res.redirect('/404');
-            });
+        return createSwapOffer(req, res);
     } else {
         let message = "You must be logged in to view this page.";
         res.status(403).render('403', { title: "CDXchange | 403: Access Denied", message: message });
     }
 });
 
+// Submitting the form for creating a swap offer.
 app.post('/mySwaps/createSwap', urlencodedParser, [
     check('ownedItem').exists(),
     check('wantedItem').exists()
@@ -359,8 +331,85 @@ app.post('/mySwaps/createSwap', urlencodedParser, [
             });
 });
 
+// Rates a user after a swap.
+app.post('/rateOffer', urlencodedParser, [
+    check('userId')
+        .exists().withMessage('UserId must exist.')
+        .isInt().withMessage('UserId must be an integer.'),
+    check('offerId')
+        .exists().withMessage('OfferId must exist.')
+        .isInt().withMessage('OfferId must be an integer.'),
+    check('rating')
+        .exists().withMessage('Rating must exist.')
+        .isInt({ gt: 0, lt: 6 }).withMessage('Rating must be an integer from 1-5.')
+], (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        return res.status(422).render('422', { title: "CDXchange | 422: Unprocessable Entity", errors: errors.array() });
+    }
+
+    OfferFeedbackModel.addFeedback(req.body.offerId, req.session.theUser._id, req.body.userId, req.body.rating, req.body.comment)
+        .then(res.redirect('/passBack?view=myswaps'))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+});
+
+// Handles redirecting because some pages weren't displaying updated data when redirected from the original route.
+// Will look into this more later.  This is just a bandaid fix.
+app.get('/passBack', (req, res) => {
+    if(req.query.view == 'myswaps') {
+        res.redirect('/mySwaps');
+    } else if(req.query.view == 'profile') {
+        res.redirect('/profile?user=' + req.query.userId);
+    } else if(req.query.view == 'item') {
+        res.redirect('/categories/' + req.query.category + '/' + req.query.item);
+    } else {
+        res.redirect('/404');
+    }
+});
+
+// Handles deleting an OfferFeedback document, and potentially more actions in the future.
+app.get('/rateOffer', (req, res) => {
+    if(req.session.theUser && req.query.action == 'delete' && req.query.theReview) {
+        return deleteReview(req, res, req.query.theReview);]
+    } else {
+        res.redirect('/404');
+    }
+});
+
+// Handles updating an OfferFeedback document.
+app.post('/editOfferFeedback', urlencodedParser, [
+    check('userId')
+        .exists().withMessage('UserId must exist.')
+        .isInt().withMessage('UserId must be an integer.'),
+    check('offerId')
+        .exists().withMessage('OfferId must exist.')
+        .isInt().withMessage('OfferId must be an integer.'),
+    check('rating')
+        .exists().withMessage('Rating must exist.')
+        .isInt({ gt: 0, lt: 6 }).withMessage('Rating must be an integer from 1-5.'),
+    check('oldRating')
+        .exists().withMessage('OldRating must exist.')
+        .isInt().withMessage('OldRating must be an integer')
+], (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        return res.status(422).render('422', { title: "CDXchange | 422: Unprocessable Entity", errors: errors.array() });
+    }
+
+    OfferFeedbackModel.editFeedback(req.body.offerId, req.session.theUser._id, req.body.userId, req.body.rating, req.body.comment, req.body.oldRating)
+        .then(res.redirect('/passBack?view=profile&userId=' + req.body.userId))
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
+})
+
 // --- FUNCTIONS ---
-// Validates that the item exists in the database.
 
 /**
  * updateItem(req, res, itemId) - Handles the update action of a user item.
@@ -726,7 +775,33 @@ function viewProfile(req, res, userId) {
                 })
         })
         .then(results => {
-            res.render('profile', { title: results[0], user: results[1], recentFeedback: results[2], recentFeedbackItems: results[3], userItems: results[4], reviewCount: results[5], swapCount: results[6] });
+            return OfferFeedbackModel.getFeedbackForUser(userId)
+                .then(offers => {
+                    results.push(offers);
+                    return results;
+                })
+        })
+        .then(results => {
+            let userIds = new Array();
+
+            results[7].forEach(review => userIds.push(review._userId));
+
+            return UserModel.getUsersInSetOfIds(userIds)
+                .then(users => {
+                    results.push(users);
+                    return results;
+                })
+        })
+        .then(results => {
+            res.render('profile', { title: results[0], 
+                                    user: results[1], 
+                                    recentFeedback: results[2], 
+                                    recentFeedbackItems: results[3], 
+                                    userItems: results[4], 
+                                    reviewCount: results[5], 
+                                    swapCount: results[6], 
+                                    reviewsOfUser: results[7],
+                                    usersWhoGaveReviews: results[8] });
         })
         .catch(err => {
             console.log(err);
@@ -763,6 +838,88 @@ function registrationError(req, res, errors) {
     })
 
     res.render('register', { title: "CDXchange | My CDs", errors: errorArray, errorParams: errorParams, userInput: userInputMap });
+}
+
+/**
+ * createSwapOffer(req, res) - Handles the creation of a swap offer (POST: /createSwap)
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ */
+function createSwapOffer(req, res) {
+    let results = new Array();
+
+    ItemModel.getItems(req.session.theUser.userItems)
+        .then(myItems => {
+            results.push(myItems);
+            return results;
+        })
+        .then(results => {
+            return OfferModel.getOffersByUserId(req.session.theUser._id)
+                .then(offers => {
+                    results.push(offers);
+                    return results;
+                })
+        })
+        .then(results => {
+            return OfferModel.getOffersInvolvingUser(req.session.theUser._id)
+                .then(offers => {
+                    results.push(offers);
+                    return results;
+                })
+        })
+        .then(results => {
+            let swappableItems = new Array();
+
+            let offers = results[1].concat(results[2])
+
+            results[0].forEach(item => {
+                let involvedInSwap = false;
+
+                offers.forEach(offer => {
+                    if(offer._ownedItemId == item._id || offer._wantedItemId == item._id && offer.status != 'Swapped') {
+                        involvedInSwap = true;
+                    }
+                });
+
+                if(involvedInSwap == false) {
+                    swappableItems.push(item);
+                }
+            })
+
+            results.push(swappableItems);
+            return results;
+        })
+        .then(results => {
+            return ItemModel.getItemsNotInArray(req.session.theUser.userItems)
+                .then(items => {
+                    results.push(items);
+                    return results;
+                })
+        })
+        .then(results => {
+            res.render('createSwap', { title: 'CDXchange | Create Swap', myItems: results[3], otherItems: results[4], userItems: results[0] });
+        })
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        });
+}
+
+/**
+ * deleteReview(req, res, reviewId) - Handles deleting an item review.
+ * @param {Request} req - The request object. 
+ * @param {Response} res - The response object.
+ * @param {Number} reviewId - The passed review _id.
+ */
+function deleteReview(req, res, reviewId) {
+    OfferFeedbackModel.deleteReview(reviewId, req.session.theUser._id)
+        .then(() => {
+            res.redirect('back');
+        })
+        .catch(err => {
+            console.error(err);
+            res.redirect('/404');
+        })
 }
 
 // --- PASSWORD FUNCTIONS ---

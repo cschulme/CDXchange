@@ -27,8 +27,8 @@ $(document).ready(function() {
         $('.modal__select').addClass("modal--show");
     });
 
-    $('.modal__rate-item--trigger').click(function() {
-        $('.modal__rate-item').addClass("modal--show");
+    $('.modal__rate--trigger').click(function() {
+        $('.modal__rate').addClass("modal--show");
     });
 
     $('.modal--close').click(function() {
@@ -63,3 +63,47 @@ $(document).ready(function() {
             .addClass('button__bubble');
     });
 });
+
+// --- Non-jQuery Functions ---
+
+function deleteUserReviewPrompt(reviewId) {
+    if(confirm("Are you sure you want to delete this review?")) {
+        window.location = '/rateOffer?action=delete&theReview=' + reviewId;
+    }
+}
+
+function editUserReview(offerId, username, userId, comment, oldRating) {
+    $('.modal__select--header h2').html("Edit Your Review Of " + username)
+    $('#userId').attr('value', userId);
+    $('#offerId').attr('value', offerId);
+    $('#oldRating').attr('value', oldRating);
+    $('#rate-text-area').attr('placeholder', "Any comments on " + username + "?")
+    if(comment != undefined && comment != '') {
+        $('#rate-text-area').html(comment);
+    }
+    $('.modal__rate').addClass("modal--show");
+}
+
+function deleteItemReviewPrompt(reviewId) {
+    if(confirm("Are you sure you want to delete this review?")) {
+        window.location = '/rateItem?action=delete&theReview=' + reviewId;
+    }
+}
+
+function editItemReview(comment, oldRating, itemName) {
+    $('.modal__select--header h2').html("Edit Your Review Of " + itemName);
+    $('#rate-item-form').attr('action', '/editItemFeedback');
+    $('#oldRating').attr('value', oldRating);
+    if(comment != undefined && comment != '') {
+        $('#rate-text-area').html(comment);
+    }
+    $('.modal__rate').addClass("modal--show");
+}
+
+function rateUser(offerId, username, otherUserId) {
+    $('.modal__select--header h2').html("Rate " + username);
+    $('#userId').attr('value', otherUserId);
+    $('#offerId').attr('value', offerId);
+    $('#rateTextArea').attr('placeholder', "Any comments on " + username + "?")
+    $('.modal__rate').addClass("modal--show");
+}

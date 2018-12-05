@@ -6,24 +6,73 @@ const autoIncrement = require('mongoose-auto-increment');
 // --- MODEL ---
 const UserSchema = new mongoose.Schema({
     _id: Number,
-    firstName: String,
-    lastName: String,
-    email: String,
+    firstName: {
+        required: true,
+        type: String
+    },
+    lastName: {
+        required: true,
+        type: String
+    },
+    email: {
+        required: true,
+        type: String
+    },
     address: {
-        address1: String,
+        address1: {
+            required: true,
+            type: String
+        },
         address2: String,
-        city: String,
+        city: {
+            required: true,
+            type: String
+        },
         // State, province, region, etc.
-        area: String,
-        postalCode: Number,
-        country: String
+        area: {
+            required: true,
+            type: String
+        },
+        postalCode:{
+            required: true,
+            type: String
+        },
+        country: {
+            required: true,
+            type: String
+        }
     },
-    username: String,
+    username: {
+        required: true,
+        type: String
+    },
     password: {
-        hash: String,
-        salt: String
+        hash: {
+            required: true,
+            type: String
+        },
+        salt: {
+            required: true,
+            type: String
+        }
     },
-    userItems: Array
+    userItems: Array,
+    rating: {
+        value: {
+            type: Number,
+            min: 0,
+            max: 5
+        },
+        actualValue: {
+            type: Number,
+            min: 0,
+            max: 5
+        },
+        numberOfVotes: {
+            type: Number,
+            min: 0
+        }
+    }
 }, {
     toObject: {
         virtuals: true
@@ -179,7 +228,12 @@ module.exports.addUser = function(firstName, lastName, email, address1, address2
                 hash: hash,
                 salt: salt
             },
-            userItems: userItems
+            userItems: userItems,
+            rating: {
+                value: 0,
+                actualValue: 0,
+                numberOfVotes: 0
+            }
         });
     
         newUser.save()

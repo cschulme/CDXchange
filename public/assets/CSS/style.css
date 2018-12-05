@@ -4,6 +4,10 @@
     transition: all ease-in-out 0.3s;
 }
 
+button {
+    background: none;
+}
+
 button:hover, input[type="submit"]:hover, a:hover {
     cursor: pointer;
 }
@@ -221,7 +225,7 @@ button:hover {
     transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
 }
 
-.modal__select--trigger, .modal__rate-item--trigger {
+.modal__select--trigger, .modal__rate--trigger {
     background: none;
 }
 
@@ -247,7 +251,7 @@ button:hover {
     overflow: auto;
 }
 
-.modal__rate-item--content {
+.modal__rate--content {
     min-width: 800px;
 }
 
@@ -293,13 +297,13 @@ button:hover {
     cursor: pointer;
 }
 
-.modal__rate-item form {
+.modal__rate form {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-.modal__rate-item textarea {
+.modal__rate textarea {
     border-radius: 20px;
     height: 200px;
     width: 600px;
@@ -1134,7 +1138,7 @@ footer a {
     grid-area: album-tracks;
 }
 
-.album-feedback__review {
+.feedback__review {
     display: grid;
     grid-template-columns: 100px 1fr;
     grid-gap: 20px;
@@ -1148,31 +1152,31 @@ footer a {
     position: relative;
 }
 
-.album-feedback__review:last-of-type {
+.feedback__review:last-of-type {
     margin-bottom: 0px;
 }
 
-.album-feedback__review--image {
+.feedback__review--image {
     height: 100px;
     width: 100px;
 }
 
-.album-feedback__review--info * {
+.feedback__review--info * {
     margin: 0px;
 }
 
-.album-feedback__review--info h4 {
+.feedback__review--info h4 {
     margin-bottom: 10px;
     font-size: 1.2rem;
     position: relative;
 }
 
-.album-feedback__review--options {
+.feedback__review--options {
     float: right;
 }
 
-.album-feedback__review--options a,
-.album-feedback__review--options button {
+.feedback__review--options a,
+.feedback__review--options button {
     background: none;
     outline: none;
     color: white;
@@ -1181,12 +1185,12 @@ footer a {
     font-size: 1.2rem;
 }
 
-.album-feedback__review--options a:hover,
-.album-feedback__review--options button:hover {
+.feedback__review--options a:hover,
+.feedback__review--options button:hover {
     color: rgb(2, 211, 176);
 }
 
-.album-feedback__review--info h4::after {
+.feedback__review--info h4::after {
     content: '';
     position: absolute;
     width: 100%;
@@ -1195,7 +1199,7 @@ footer a {
     background-color: rgb(2, 211, 176);
 }
 
-.album-feedback__review--info p {
+.feedback__review--info p {
     margin-top: 10px;
 }
 
@@ -1234,8 +1238,17 @@ footer a {
 }
 
 .profile-content__info--data-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     position: relative;
     margin-bottom: 10px;
+}
+
+.profile-content__info--data-header span {
+    text-transform: uppercase;
+    color: grey;
+    float: right;
 }
 
 .profile-content__info--data-header::after {
@@ -1260,6 +1273,7 @@ footer a {
 /* === MISC CLASSES === */
 
 .rating {
+    text-transform: uppercase;
     color: grey;
 }
 

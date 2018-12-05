@@ -10,12 +10,20 @@ const OfferSchema = new mongoose.Schema({
         required: true,
         type: Number
     },
+    userRated: {
+        status: Boolean,
+        _feedbackId: Number
+    },
     _ownedItemId: {
         required: true,
         type: String
     },
     _wantedItemId: String,
     _otherUserId: Number,
+    otherUserRated: {
+        status: Boolean,
+        _feedbackId: Number  
+    },
     status: {
         required: true,
         type: String,
@@ -60,6 +68,19 @@ module.exports.getOfferById = function(id) {
 module.exports.getOffersByUserId = function(userId) {
     return new Promise((resolve, reject) => {
         Offer.find({ _userId: userId })
+            .then(docs => resolve(docs))
+            .catch(err => reject(err))
+    })
+}
+
+/**
+ * getOffersInvolvingUser(userId) - Returns all offers where the specified user is the _otherUserId.
+ * @param {Number} userId - The _id of the user we're filtering by.
+ * @returns {Promise<any>}
+ */
+module.exports.getOffersInvolvingUser = function(userId) {
+    return new Promise((resolve, reject) => {
+        Offer.find({ _otherUserId: userId })
             .then(docs => resolve(docs))
             .catch(err => reject(err))
     })
@@ -118,9 +139,17 @@ module.exports.addOffer = function(userId, ownedItemId, wantedItemId, otherUserI
     return new Promise((resolve, reject) => {
         let newOffer = new Offer({
             _userId: userId,
+            userRated: {
+                status: false,
+                _feedbackId: undefined
+            },
             _ownedItemId: ownedItemId,
             _wantedItemId: wantedItemId,
             _otherUserId: otherUserId,
+            otherUserRated: {
+                status: false,
+                _feedbackId: undefined
+            },
             status: status
         });
     
@@ -194,8 +223,87 @@ module.exports.deleteOffer = function(id) {
  */
 module.exports.getNumberOfOffersInvolvingAUser = function(userId) {
     return new Promise((resolve, reject) => {
-        Offer.count({ $or: [{ _userId: userId }, { _otherUserId: userId }] })
+        Offer.countDocuments({ $or: [{ _userId: userId }, { _otherUserId: userId }] })
             .then(doc => resolve(doc))
+            .catch(err => reject(err))
+    });
+}
+
+/**
+ * feedbackGiven(offerId, userId, feedbackId) - Attaches a OfferFeedback document to 
+ *      an offer after figuring out if the passed user is involved with the offer and
+ *      on which end the user belongs to.
+ * @param {Number} offerId - The id of the offer.
+ * @param {Number} userId - The id of the user.
+ * @param {Number} feedbackId - The id of the feedback document.
+ * @return {Promise<any>}
+ */
+module.exports.feedbackGiven = function(offerId, userId, feedbackId) {
+    return new Promise((resolve, reject) => {
+        Offer.findOne({ _id: offerId })
+            .then(offer => {
+                if(userId == offer._userId) {
+                    let update = {
+                        userRated: {
+                            status: true,
+                            _feedbackId: feedbackId
+                        }
+                    };
+
+                    Offer.findOneAndUpdate({ _id: offerId }, update, { new: true })
+                        .then(offer => resolve(offer));
+                } else if(userId == offer._otherUserId) {
+                    let update = {
+                        otherUserRated: {
+                            status: true,
+                            _feedbackId: feedbackId
+                        }
+                    };
+
+                    Offer.findOneAndUpdate({ _id: offerId }, update, { new: true })
+                        .then(offer => resolve(offer));
+                } else {
+                    return reject("User isn't involved in offer.");
+                }
+            })
+            .catch(err => reject(err))
+    });
+}
+
+/**
+ * removeReview(offerId, userId) - Removes a review from an offer given an offerId and a userId.
+ * @param {Number} offerId - The _id attribute of the offer.
+ * @param {Number} userId - The _id attribute of the user.
+ * @returns {Promise<any>}
+ */
+module.exports.removeReview = function(offerId, userId) {
+    return new Promise((resolve, reject) => {
+        Offer.findOne({ _id: offerId })
+            .then(offer => {
+                if(userId == offer._userId) {
+                    let update = {
+                        userRated: {
+                            status: false,
+                            _feedbackId: undefined
+                        }
+                    };
+
+                    Offer.findOneAndUpdate({ _id: offerId }, update, { new: true })
+                        .then(offer => resolve(offer))
+                } else if(userId == offer._otherUserId) {
+                    let update = {
+                        otherUserRated: {
+                            status: false,
+                            _feedbackId: undefined
+                        }
+                    };
+
+                    Offer.findOneAndUpdate({ _id: offerId }, update, { new: true })
+                        .then(offer => resolve(offer));
+                } else {
+                    return reject("User isn't involved in offer.");
+                }
+            })
             .catch(err => reject(err))
     });
 }

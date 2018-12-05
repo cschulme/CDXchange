@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "resetDb": "node -e 'require(\"./public/dbPrepopulate\").resetDb()'",
-    "dropDb": "node -e 'require(\"./public/dbPrepopulate\").dropDb()'"
+    "resetDb": "node -e 'require(\"./public/dbPrepopulate\").resetDb()'"
   },
   "repository": {
     "type": "git",
